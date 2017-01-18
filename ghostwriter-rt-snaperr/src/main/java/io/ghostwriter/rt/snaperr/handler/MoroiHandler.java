@@ -1,6 +1,6 @@
 package io.ghostwriter.rt.snaperr.handler;
 
-import io.ghostwriter.rt.snaperr.GhostWriterSnaperr;
+import io.ghostwriter.rt.snaperr.SnaperrTracer;
 import io.ghostwriter.rt.snaperr.Logger;
 import io.ghostwriter.rt.snaperr.serializer.JsonSerializer;
 import io.ghostwriter.rt.snaperr.serializer.TriggerSerializer;
@@ -63,7 +63,7 @@ public class MoroiHandler implements TriggerHandler {
 
         JsonSerializer serializer2 = new JsonSerializer(moroiAppUUID);
         MoroiHandler moroiHandler = new MoroiHandler(moroiUrl, serializer2, noSslHostnameVerification);
-        GhostWriterSnaperr ghostWriterSnaperr = new GhostWriterSnaperr(moroiHandler);
+        SnaperrTracer ghostWriterSnaperr = new SnaperrTracer(moroiHandler);
 
         String METHOD_NAME = "main";
         ghostWriterSnaperr.entering(MoroiHandler.class, METHOD_NAME);

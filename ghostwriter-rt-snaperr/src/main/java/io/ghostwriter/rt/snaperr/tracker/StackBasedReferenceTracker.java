@@ -55,7 +55,7 @@ public class StackBasedReferenceTracker implements ReferenceTracker {
         final ScopeStack trackedScopes = trackedThreadStack.get();
         final TrackedScope currentScope = trackedScopes.peek();
         Map<String, TrackedValue> lockedReferences = Collections.unmodifiableMap(currentScope.getReferences());
-        return new TrackedScope(currentScope.getSource(), currentScope.getMethodName(), lockedReferences);
+        return new TrackedScopeImpl(currentScope.getSource(), currentScope.getMethodName(), lockedReferences);
     }
 
     @Override

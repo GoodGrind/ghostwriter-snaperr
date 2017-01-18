@@ -10,16 +10,16 @@ import io.ghostwriter.rt.snaperr.trigger.TriggerHandler;
 
 import java.util.Properties;
 
-public class GhostWriterSnaperrProvider implements TracerProvider<GhostWriterSnaperr> {
+public class GhostWriterSnaperrProvider implements TracerProvider<SnaperrTracer> {
 
     private final Logger LOG = Logger.getLogger(GhostWriterSnaperrProvider.class.getName());
 
-    private GhostWriterSnaperr ghostWriterSnaperr;
+    private SnaperrTracer ghostWriterSnaperr;
     private boolean gwSetupSuccessful;
 
     @Override
-    public GhostWriterSnaperr getTracer() {
-        synchronized (GhostWriterSnaperrProvider.class) {
+    public SnaperrTracer getTracer() {
+        synchronized (this) {
 
             if (gwSetupSuccessful) {
                 return ghostWriterSnaperr;
@@ -40,15 +40,15 @@ public class GhostWriterSnaperrProvider implements TracerProvider<GhostWriterSna
                 final TriggerHandler triggerHandler = new MoroiHandler(moroiErrorUrl, triggerSerializer, noSslHostnameVerification);
 
                 final String strThrottleWindowSize = gwProperties.getProperty(ConfigurationReader.CFG_THROTTLE_WINDOW_SIZE,
-                        String.valueOf(GhostWriterSnaperr.DEFAULT_ERROR_WINDOW_SIZE_MS));
+                        String.valueOf(SnaperrTracer.DEFAULT_ERROR_WINDOW_SIZE_MS));
                 final long throttleWindowSize = Long.parseLong(strThrottleWindowSize);
 
                 final String strThrottleMaxErrorsInWindow = gwProperties.getProperty(ConfigurationReader.CFG_THROTTLE_MAX_ERRORS,
-                        String.valueOf(GhostWriterSnaperr.DEFAULT_MAX_ERROR_COUNT_IN_WINDOW));
+                        String.valueOf(SnaperrTracer.DEFAULT_MAX_ERROR_COUNT_IN_WINDOW));
                 final int throttleMaxErrorsInWindow = Integer.parseInt(strThrottleMaxErrorsInWindow);
 
 
-                ghostWriterSnaperr = new GhostWriterSnaperr(referenceTracker, triggerHandler, throttleWindowSize,
+                ghostWriterSnaperr = new SnaperrTracer(referenceTracker, triggerHandler, throttleWindowSize,
                         throttleMaxErrorsInWindow);
 
                 gwSetupSuccessful = true;

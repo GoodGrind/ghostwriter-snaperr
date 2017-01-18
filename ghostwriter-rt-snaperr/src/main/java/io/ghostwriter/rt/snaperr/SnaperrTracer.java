@@ -5,12 +5,13 @@ import io.ghostwriter.rt.snaperr.handler.Slf4jHandler;
 import io.ghostwriter.rt.snaperr.tracker.ReferenceTracker;
 import io.ghostwriter.rt.snaperr.tracker.StackBasedReferenceTracker;
 import io.ghostwriter.rt.snaperr.trigger.ErrorTrigger;
+import io.ghostwriter.rt.snaperr.trigger.ErrorTriggerImpl;
 import io.ghostwriter.rt.snaperr.trigger.TimeoutTrigger;
 import io.ghostwriter.rt.snaperr.trigger.TriggerHandler;
 
 import java.util.Objects;
 
-public class GhostWriterSnaperr implements Tracer {
+public class SnaperrTracer implements Tracer {
 
     static final long DEFAULT_ERROR_WINDOW_SIZE_MS = 1000;
     static final int DEFAULT_MAX_ERROR_COUNT_IN_WINDOW = 5;
@@ -24,6 +25,7 @@ public class GhostWriterSnaperr implements Tracer {
             return new ErrorState();
         }
     };
+    
     /**
      * For throttling, amount of time where maximum {@link #maxErrorsInWindow}
      * errors are allowed. < 0 means no throttling
@@ -41,17 +43,17 @@ public class GhostWriterSnaperr implements Tracer {
      */
     private TriggerHandler triggerHandler;
 
-    public GhostWriterSnaperr() {
+    public SnaperrTracer() {
         this(defaultReferenceTracker(), defaultTriggerHandler(), DEFAULT_ERROR_WINDOW_SIZE_MS,
                 DEFAULT_MAX_ERROR_COUNT_IN_WINDOW);
     }
 
-    public GhostWriterSnaperr(TriggerHandler triggerHandler) {
+    public SnaperrTracer(TriggerHandler triggerHandler) {
         this(defaultReferenceTracker(), triggerHandler, DEFAULT_ERROR_WINDOW_SIZE_MS,
                 DEFAULT_MAX_ERROR_COUNT_IN_WINDOW);
     }
 
-    public GhostWriterSnaperr(ReferenceTracker referenceTracker, TriggerHandler triggerHandler,
+    public SnaperrTracer(ReferenceTracker referenceTracker, TriggerHandler triggerHandler,
                               long errorWindowSize, int maxErrorsInWindow) {
         this.referenceTracker = Objects.requireNonNull(referenceTracker);
         this.triggerHandler = triggerHandler;
@@ -124,7 +126,7 @@ public class GhostWriterSnaperr implements Tracer {
          * application yet, but we will read them.
          */
 
-        ErrorTrigger trigger = new ErrorTrigger(referenceTracker, error);
+        ErrorTrigger trigger = new ErrorTriggerImpl(referenceTracker, error);
 
         startTriggerProcessing(trigger);
         triggerHandler.onError(trigger);

@@ -1,14 +1,23 @@
 package io.ghostwriter.rt.snaperr.serializer;
 
-import io.ghostwriter.rt.snaperr.moroi.*;
-import io.ghostwriter.rt.snaperr.tracker.ReferenceTracker;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import io.ghostwriter.rt.snaperr.moroi.Attributes;
+import io.ghostwriter.rt.snaperr.moroi.Context;
+import io.ghostwriter.rt.snaperr.moroi.ContextData;
+import io.ghostwriter.rt.snaperr.moroi.MoroiEntry;
+import io.ghostwriter.rt.snaperr.moroi.MoroiEntryData;
+import io.ghostwriter.rt.snaperr.moroi.Variable;
 import io.ghostwriter.rt.snaperr.tracker.TrackedScope;
 import io.ghostwriter.rt.snaperr.tracker.TrackedValue;
 import io.ghostwriter.rt.snaperr.trigger.ErrorTrigger;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.*;
 
 public class MoroiEntryMapper {
 
@@ -22,9 +31,8 @@ public class MoroiEntryMapper {
     public MoroiEntry toMoroiEntry(ErrorTrigger errorTrigger) {
         Objects.requireNonNull(errorTrigger);
 
-        ReferenceTracker referenceTracker = errorTrigger.getReferenceTracker();
         // FIXME(snorbi07): this needs to be extended to support multiple scopes
-        TrackedScope topLevelScope = referenceTracker.currentScope();
+        TrackedScope topLevelScope = errorTrigger.currentScope();
 
         Object source = topLevelScope.getSource();
 
@@ -58,9 +66,7 @@ public class MoroiEntryMapper {
         Context context = new Context();
         List<ContextData> contextDataList = context.getData();
 
-        ReferenceTracker refTracker = errorTrigger.getReferenceTracker();
-
-        Iterator<TrackedScope> trackedScopeIterator = refTracker.getTrackedScopeIterator();
+        Iterator<TrackedScope> trackedScopeIterator = errorTrigger.getTrackedScopeIterator();
 
         while (trackedScopeIterator.hasNext()) {
             TrackedScope currScope = trackedScopeIterator.next();

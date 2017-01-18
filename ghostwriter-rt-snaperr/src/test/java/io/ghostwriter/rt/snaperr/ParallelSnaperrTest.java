@@ -19,7 +19,7 @@ public class ParallelSnaperrTest {
     @Test
     public void testStateConflict() {
         final ParallelTriggerHandler parallelTriggerHandler = new ParallelTriggerHandler();
-        final GhostWriterSnaperr gwErrMon = new GhostWriterSnaperr(parallelTriggerHandler);
+        final SnaperrTracer gwErrMon = new SnaperrTracer(parallelTriggerHandler);
 
         // We need to make sure that  2 threads are executed at the "same time".
         // This way we can assure the timing from the main thread. Hence the 3 threads instead of 2.

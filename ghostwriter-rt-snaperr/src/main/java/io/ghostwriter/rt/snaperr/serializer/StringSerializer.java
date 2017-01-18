@@ -1,25 +1,25 @@
 package io.ghostwriter.rt.snaperr.serializer;
 
 
-import io.ghostwriter.rt.snaperr.tracker.ReferenceTracker;
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.Objects;
+
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+
 import io.ghostwriter.rt.snaperr.tracker.TrackedScope;
 import io.ghostwriter.rt.snaperr.tracker.TrackedValue;
 import io.ghostwriter.rt.snaperr.trigger.ErrorTrigger;
 import io.ghostwriter.rt.snaperr.trigger.TimeoutTrigger;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.Objects;
 
 public class StringSerializer implements TriggerSerializer<String> {
 
     @Override
     public String serializeTrigger(ErrorTrigger errorTrigger) {
         Objects.requireNonNull(errorTrigger);
-        ReferenceTracker referenceTracker = errorTrigger.getReferenceTracker();
+        
         // FIXME(snorbi07): needs to be extended to support scope iteration
-        TrackedScope topLevelScope = referenceTracker.currentScope();
+        TrackedScope topLevelScope = errorTrigger.currentScope();
 
         final Object source = topLevelScope.getSource();
         final String methodName = topLevelScope.getMethodName();

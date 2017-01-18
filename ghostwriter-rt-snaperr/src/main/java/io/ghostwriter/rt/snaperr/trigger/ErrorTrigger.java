@@ -1,26 +1,19 @@
 package io.ghostwriter.rt.snaperr.trigger;
 
-import io.ghostwriter.rt.snaperr.tracker.ReferenceTracker;
+import java.util.Iterator;
 
-import java.util.Objects;
+import io.ghostwriter.rt.snaperr.tracker.TrackedScope;
 
+/**
+ * Holds information about the program state at the point of error:
+ * <li>Throwable
+ * <li>List of Scopes on the stack
+ */
+public interface ErrorTrigger {
 
-final public class ErrorTrigger {
+    public Throwable getThrowable();
 
-    private final ReferenceTracker referenceTracker;
+    TrackedScope currentScope();
 
-    private final Throwable throwable;
-
-    public ErrorTrigger(ReferenceTracker referenceTracker, Throwable throwable) {
-        this.referenceTracker = Objects.requireNonNull(referenceTracker);
-        this.throwable = Objects.requireNonNull(throwable);
-    }
-
-    public ReferenceTracker getReferenceTracker() {
-        return referenceTracker;
-    }
-
-    public Throwable getThrowable() {
-        return throwable;
-    }
+    Iterator<TrackedScope> getTrackedScopeIterator();
 }

@@ -1,6 +1,6 @@
 package io.ghostwriter.rt.snaperr.handler;
 
-import io.ghostwriter.rt.snaperr.GhostWriterSnaperr;
+import io.ghostwriter.rt.snaperr.SnaperrTracer;
 import io.ghostwriter.rt.snaperr.serializer.StringSerializer;
 import io.ghostwriter.rt.snaperr.serializer.TriggerSerializer;
 import io.ghostwriter.rt.snaperr.trigger.ErrorTrigger;
@@ -18,7 +18,7 @@ public class Slf4jHandler implements TriggerHandler {
     @Override
     public void onError(ErrorTrigger errorTrigger) {
         StringBuilder sb = new StringBuilder();
-        sb.append(GhostWriterSnaperr.class.getCanonicalName()).append(" state snapshot: \n");
+        sb.append(SnaperrTracer.class.getCanonicalName()).append(" state snapshot: \n");
         final String str = serializer.serializeTrigger(errorTrigger);
         sb.append(str);
 

@@ -24,7 +24,7 @@ public class ScopeStack implements Iterable<TrackedScope> {
      * It's important to use ArrayList because it has O(1) cost for indexing
      * elements in the middle of the list
      */
-    private final List<TrackedScope> stack = new ArrayList<>(INITIAL_CAPACITY);
+    private final List<TrackedScopeImpl> stack = new ArrayList<>(INITIAL_CAPACITY);
 
     /**
      * Index of last inserted element within <i>stack</i>
@@ -40,14 +40,14 @@ public class ScopeStack implements Iterable<TrackedScope> {
 			 * We reached the end of the list, so we create and append a new
 			 * TrackedScope element to
 			 */
-            stack.add(new TrackedScope(source, methodName, references));
+            stack.add(new TrackedScopeImpl(source, methodName, references));
             lastInsertedIndex++;
         } else if (stackLastElementIndex > lastInsertedIndex) {
 			/*
 			 * The lastIndex points to the middle of the list, so we set the
 			 * values to the existing TrackedScope element
 			 */
-            TrackedScope last = stack.get(++lastInsertedIndex);
+            TrackedScopeImpl last = stack.get(++lastInsertedIndex);
             last.setSource(source);
             last.setMethodName(methodName);
             last.setReferences(references);
@@ -62,7 +62,7 @@ public class ScopeStack implements Iterable<TrackedScope> {
      * Removes the last element from the list.
      */
     void pop() {
-        TrackedScope peek = peek();
+        TrackedScopeImpl peek = peek();
         peek.setMethodName(null);
         peek.setReferences(null);
         peek.setSource(null);
@@ -76,8 +76,8 @@ public class ScopeStack implements Iterable<TrackedScope> {
      *
      * @return Last inserted element
      */
-    TrackedScope peek() {
-        TrackedScope trackedScope = stack.get(lastInsertedIndex);
+    TrackedScopeImpl peek() {
+        TrackedScopeImpl trackedScope = stack.get(lastInsertedIndex);
         return trackedScope;
     }
 
@@ -102,20 +102,20 @@ public class ScopeStack implements Iterable<TrackedScope> {
     @Override
     public Iterator<TrackedScope> iterator() {
         final int toIndexExclusive = lastInsertedIndex + 1;
-        List<TrackedScope> notNullElements = stack.subList(0, toIndexExclusive);
+        List<TrackedScopeImpl> notNullElements = stack.subList(0, toIndexExclusive);
         return new ScopeStackReverseIterator(notNullElements);
     }
 
     public static class ScopeStackReverseIterator implements Iterator<TrackedScope> {
 
-        final Iterator<TrackedScope> listIterator;
+        final Iterator<TrackedScopeImpl> listIterator;
 
-        private ScopeStackReverseIterator(List<TrackedScope> stack) {
+        private ScopeStackReverseIterator(List<TrackedScopeImpl> stack) {
 			/*
 			 * Create a new list, we take a snapshot to avoid concurrent
 			 * modification
 			 */
-            List<TrackedScope> stackCopy = new LinkedList<>(stack);
+            List<TrackedScopeImpl> stackCopy = new LinkedList<>(stack);
 
             // Revert it, ListIterator#hasPrevious did not seem to work
             Collections.reverse(stackCopy);

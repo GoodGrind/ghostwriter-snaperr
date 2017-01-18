@@ -20,7 +20,7 @@ public class SnaperrTest {
         final String METHOD_NAME = "testTriggerCreation";
         final Object expectedContext = this;
 
-        GhostWriterSnaperr gwErrMon = new GhostWriterSnaperr(new TriggerHandler() {
+        SnaperrTracer gwErrMon = new SnaperrTracer(new TriggerHandler() {
             @Override
             public void onError(ErrorTrigger trigger) {
                 final TrackedScope topLevelScope = trigger.getReferenceTracker().currentScope();
@@ -76,7 +76,7 @@ public class SnaperrTest {
     @Test
     public void testTrackedPrimitiveValueUpdate() {
         final String METHOD_NAME = "testTrackedPrimitiveValueUpdate";
-        GhostWriterSnaperr gwErrMon = new GhostWriterSnaperr(new TriggerHandler() {
+        SnaperrTracer gwErrMon = new SnaperrTracer(new TriggerHandler() {
             @Override
             public void onError(ErrorTrigger trigger) {
                 final TrackedScope topLevelScope = trigger.getReferenceTracker().currentScope();
@@ -105,7 +105,7 @@ public class SnaperrTest {
         final String METHOD_NAME = "testTrackedMutableObjectStateChange";
 
         final MutableValueClass mvc = new MutableValueClass("this is a String", 981);
-        GhostWriterSnaperr gwErrMon = new GhostWriterSnaperr(new TriggerHandler() {
+        SnaperrTracer gwErrMon = new SnaperrTracer(new TriggerHandler() {
             @Override
             public void onError(ErrorTrigger trigger) {
                 final TrackedScope topLevelScope = trigger.getReferenceTracker().currentScope();
@@ -135,7 +135,7 @@ public class SnaperrTest {
     @Test
     public void testTrackedReferenceChange() {
         final String METHOD_NAME = "testTrackedReferenceChange";
-        GhostWriterSnaperr gwErrMon = new GhostWriterSnaperr(new TriggerHandler() {
+        SnaperrTracer gwErrMon = new SnaperrTracer(new TriggerHandler() {
             @Override
             public void onError(ErrorTrigger trigger) {
                 final TrackedScope topLevelScope = trigger.getReferenceTracker().currentScope();
@@ -163,7 +163,7 @@ public class SnaperrTest {
 
     @Test
     public void testTrackedScope() {
-        GhostWriterSnaperr gwSnaperr = new GhostWriterSnaperr(new TriggerHandler() {
+        SnaperrTracer gwSnaperr = new SnaperrTracer(new TriggerHandler() {
             @Override
             public void onError(ErrorTrigger trigger) {
                 final TrackedScope topLevelScope = trigger.getReferenceTracker().currentScope();
@@ -210,7 +210,7 @@ public class SnaperrTest {
             }
          */
 
-        GhostWriterSnaperr gwSnaperr = new GhostWriterSnaperr(new TriggerHandler() {
+        SnaperrTracer gwSnaperr = new SnaperrTracer(new TriggerHandler() {
             @Override
             public void onError(ErrorTrigger trigger) {
                 final TrackedScope topLevelScope = trigger.getReferenceTracker().currentScope();
@@ -267,7 +267,7 @@ public class SnaperrTest {
          */
 
         final ExceptionRethrowHandler triggerHandler = new ExceptionRethrowHandler();
-        GhostWriterSnaperr gwSnaperr = new GhostWriterSnaperr(triggerHandler);
+        SnaperrTracer gwSnaperr = new SnaperrTracer(triggerHandler);
 
         gwSnaperr.entering(this, "method1");
         gwSnaperr.valueChange(this, "method1", "x", 1);
@@ -306,7 +306,7 @@ public class SnaperrTest {
 
          */
 
-        GhostWriterSnaperr gwSnapper = new GhostWriterSnaperr(new TriggerHandler() {
+        SnaperrTracer gwSnapper = new SnaperrTracer(new TriggerHandler() {
 
             @Override
             public void onError(ErrorTrigger errorTrigger) {
@@ -342,7 +342,7 @@ public class SnaperrTest {
         // It can happen that we call a GW instrumented function during Trigger processing, for example toString method of a POJO.
         // The implementation should be robust and handle this as well.
 
-        final GhostWriterSnaperr gwSnapper = new GhostWriterSnaperr(TrackedValueAsserter.noopTriggerHandler());
+        final SnaperrTracer gwSnapper = new SnaperrTracer(TrackedValueAsserter.noopTriggerHandler());
         final TriggerHandler triggerHandler = new TriggerHandler() {
             @Override
             public void onError(ErrorTrigger errorTrigger) {
@@ -391,7 +391,7 @@ public class SnaperrTest {
     public void testErrorEventDuringTriggerProcessing() {
         // It can happen that we call a GW instrumented function during Trigger processing that also triggers an error, for example circular serialization
 
-        final GhostWriterSnaperr gwSnapper = new GhostWriterSnaperr(TrackedValueAsserter.noopTriggerHandler());
+        final SnaperrTracer gwSnapper = new SnaperrTracer(TrackedValueAsserter.noopTriggerHandler());
         final TriggerHandler triggerHandler = new TriggerHandler() {
             @Override
             public void onError(ErrorTrigger errorTrigger) {
@@ -456,7 +456,7 @@ public class SnaperrTest {
             }
          */
 
-        GhostWriterSnaperr gwSnaperr = new GhostWriterSnaperr(new TriggerHandler() {
+        SnaperrTracer gwSnaperr = new SnaperrTracer(new TriggerHandler() {
             @Override
             public void onError(ErrorTrigger trigger) {
                 final ReferenceTracker referenceTracker = trigger.getReferenceTracker();
