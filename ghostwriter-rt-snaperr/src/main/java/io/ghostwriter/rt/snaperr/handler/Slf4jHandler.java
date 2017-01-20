@@ -1,7 +1,6 @@
 package io.ghostwriter.rt.snaperr.handler;
 
 import io.ghostwriter.rt.snaperr.SnaperrTracer;
-import io.ghostwriter.rt.snaperr.serializer.StringSerializer;
 import io.ghostwriter.rt.snaperr.serializer.TriggerSerializer;
 import io.ghostwriter.rt.snaperr.trigger.ErrorTrigger;
 import io.ghostwriter.rt.snaperr.trigger.TimeoutTrigger;
@@ -13,8 +12,12 @@ public class Slf4jHandler implements TriggerHandler {
 
     private static Logger LOG = LoggerFactory.getLogger(Slf4jHandler.class);
 
-    private TriggerSerializer<String> serializer = new StringSerializer();
+    private final TriggerSerializer<String> serializer;
 
+    public Slf4jHandler(TriggerSerializer<String> serializer) {
+	this.serializer = serializer;
+    }
+    
     @Override
     public void onError(ErrorTrigger errorTrigger) {
         StringBuilder sb = new StringBuilder();

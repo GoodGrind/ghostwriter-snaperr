@@ -1,5 +1,7 @@
 package io.ghostwriter.rt.snaperr;
 
+import java.util.Objects;
+
 import io.ghostwriter.Tracer;
 import io.ghostwriter.rt.snaperr.handler.Slf4jHandler;
 import io.ghostwriter.rt.snaperr.tracker.ReferenceTracker;
@@ -7,9 +9,8 @@ import io.ghostwriter.rt.snaperr.tracker.StackBasedReferenceTracker;
 import io.ghostwriter.rt.snaperr.trigger.ErrorTrigger;
 import io.ghostwriter.rt.snaperr.trigger.ErrorTriggerImpl;
 import io.ghostwriter.rt.snaperr.trigger.TimeoutTrigger;
+import io.ghostwriter.rt.snaperr.trigger.TimeoutTriggerImpl;
 import io.ghostwriter.rt.snaperr.trigger.TriggerHandler;
-
-import java.util.Objects;
 
 public class SnaperrTracer implements Tracer {
 
@@ -43,16 +44,6 @@ public class SnaperrTracer implements Tracer {
      */
     private TriggerHandler triggerHandler;
 
-    public SnaperrTracer() {
-        this(defaultReferenceTracker(), defaultTriggerHandler(), DEFAULT_ERROR_WINDOW_SIZE_MS,
-                DEFAULT_MAX_ERROR_COUNT_IN_WINDOW);
-    }
-
-    public SnaperrTracer(TriggerHandler triggerHandler) {
-        this(defaultReferenceTracker(), triggerHandler, DEFAULT_ERROR_WINDOW_SIZE_MS,
-                DEFAULT_MAX_ERROR_COUNT_IN_WINDOW);
-    }
-
     public SnaperrTracer(ReferenceTracker referenceTracker, TriggerHandler triggerHandler,
                               long errorWindowSize, int maxErrorsInWindow) {
         this.referenceTracker = Objects.requireNonNull(referenceTracker);
@@ -61,13 +52,6 @@ public class SnaperrTracer implements Tracer {
         this.maxErrorsInWindow = maxErrorsInWindow;
     }
 
-    private static TriggerHandler defaultTriggerHandler() {
-        return new Slf4jHandler();
-    }
-
-    private static ReferenceTracker defaultReferenceTracker() {
-        return new StackBasedReferenceTracker();
-    }
 
     @Override
     public void entering(Object source, String method, Object... params) {
@@ -151,7 +135,7 @@ public class SnaperrTracer implements Tracer {
         // Unlike in the case of on error trigger, we don't need to guard for timeouts propagating.
         // This is an opt-in feature, so if the user annotates the call-chain, then we might end up raising timeouts at all steps...
 
-        TimeoutTrigger trigger = new TimeoutTrigger(referenceTracker, timeoutThreshold, timeout);
+        TimeoutTrigger trigger = new TimeoutTriggerImpl(referenceTracker, timeoutThreshold, timeout);
         startTriggerProcessing(null);
         triggerHandler.onTimeout(trigger);
         stopTriggerProcessing();

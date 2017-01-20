@@ -21,10 +21,10 @@ public class ConfigurationReader {
     static final String CONFIG_FILE_PROTOCOL_FILE = "file://";
     static final String CFG_GW_PROPERTY_NAME_PREFIX = "io.ghostwriter.";
     static final String CFG_GW_APP_NAME = CFG_GW_PROPERTY_NAME_PREFIX + "app_name";
-    static final String CFG_MOROI_APP_UUID = "moroi.application_uuid";
+    public static final String CFG_MOROI_APP_UUID = "moroi.application_uuid";
     /* Below are the available Snaperr config properties */
     static final String CFG_CONFIG_FILE = "config_file";
-    static final String CFG_MOROI_ERROR_URL = "moroi.error_url";
+    public static final String CFG_MOROI_ERROR_URL = "moroi.error_url";
     static final String CFG_THROTTLE_WINDOW_SIZE = "throttle.window_size";
     static final String CFG_THROTTLE_MAX_ERRORS = "throttle.max_errors_in_window";
     private static final String[] GW_APP_CFG_FILE_PATHS = {"io.ghostwriter.application",
@@ -49,7 +49,7 @@ public class ConfigurationReader {
      * @return All the GhostWriter runtime parameters without the <i>'io.ghostwriter[.appName].'</i> prefix i.e.
      * <i>'io.ghostwriter.myApplication.moroi.error_url'</i> will become <i>'moroi.error_url'</i>
      */
-    Properties getGwProperties(final String gwAppName) {
+    public Properties getGwProperties(final String gwAppName) {
         final String propertyNamePrefix = getGwPropertyNamePrefix(gwAppName);
         final String configFileSysPropName = getGwConfigFilePropertyName(propertyNamePrefix);
 
@@ -169,7 +169,7 @@ public class ConfigurationReader {
         return gwProperties;
     }
 
-    String getGwAppName() {
+    public String getGwAppName() {
         String appConfigFileName = findGwConfigFile();
 
         if (appConfigFileName == null) {
