@@ -4,6 +4,9 @@ package io.ghostwriter.rt.snaperr.tracker;
 import java.util.Iterator;
 import java.util.Objects;
 
+import io.ghostwriter.rt.snaperr.api.ReferenceTracker;
+import io.ghostwriter.rt.snaperr.api.TrackedScope;
+
 
 public class ReferenceTrackerTraverser implements Iterator<TrackedScope> {
 

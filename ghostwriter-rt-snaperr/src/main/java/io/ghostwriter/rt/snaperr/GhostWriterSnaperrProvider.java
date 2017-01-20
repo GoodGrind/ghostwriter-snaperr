@@ -4,12 +4,13 @@ import java.util.Properties;
 import java.util.ServiceLoader;
 
 import io.ghostwriter.TracerProvider;
+import io.ghostwriter.rt.snaperr.api.ReferenceTracker;
+import io.ghostwriter.rt.snaperr.api.SnaperrServiceLoader;
+import io.ghostwriter.rt.snaperr.api.TriggerHandler;
+import io.ghostwriter.rt.snaperr.api.TriggerSerializer;
 import io.ghostwriter.rt.snaperr.handler.Slf4jTriggerHandlerServiceLoader;
 import io.ghostwriter.rt.snaperr.serializer.JsonSerializerServiceLoader;
-import io.ghostwriter.rt.snaperr.serializer.TriggerSerializer;
-import io.ghostwriter.rt.snaperr.tracker.ReferenceTracker;
 import io.ghostwriter.rt.snaperr.tracker.StackBasedReferenceTracker;
-import io.ghostwriter.rt.snaperr.trigger.TriggerHandler;
 
 public class GhostWriterSnaperrProvider implements TracerProvider<SnaperrTracer> {
 

@@ -2,9 +2,11 @@ package io.ghostwriter.rt.snaperr.serializer;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.ghostwriter.rt.snaperr.tracker.ReferenceTracker;
+
+import io.ghostwriter.rt.snaperr.api.ErrorTrigger;
+import io.ghostwriter.rt.snaperr.api.ReferenceTracker;
 import io.ghostwriter.rt.snaperr.tracker.StackBasedReferenceTracker;
-import io.ghostwriter.rt.snaperr.trigger.ErrorTrigger;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -27,7 +29,7 @@ public class JsonSerializerTest {
         final boolean doPrettyPrint = false;
         final int stackTraceLimit = 1;
         final String appName = "appName";
-        final MoroiSerializer jsonSerializer = new MoroiSerializer(appName, doPrettyPrint, stackTraceLimit);
+        final JsonSerializer jsonSerializer = new JsonSerializer(appName, doPrettyPrint, stackTraceLimit);
 
         Throwable throwable = new IllegalArgumentException("someError");
         ReferenceTracker referenceTracker = new StackBasedReferenceTracker();
@@ -49,7 +51,7 @@ public class JsonSerializerTest {
         final boolean doPrettyPrint = false;
         final int stackTraceLimit = 1;
         final String appName = "appName";
-        final MoroiSerializer jsonSerializer = new MoroiSerializer(appName, doPrettyPrint, stackTraceLimit);
+        final JsonSerializer jsonSerializer = new JsonSerializer(appName, doPrettyPrint, stackTraceLimit);
 
         Throwable throwable = new IllegalArgumentException("someError");
         ReferenceTracker referenceTracker = new StackBasedReferenceTracker();

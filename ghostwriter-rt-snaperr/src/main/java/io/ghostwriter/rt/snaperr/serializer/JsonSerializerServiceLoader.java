@@ -3,7 +3,8 @@ package io.ghostwriter.rt.snaperr.serializer;
 import java.util.Properties;
 
 import io.ghostwriter.rt.snaperr.ConfigurationReader;
-import io.ghostwriter.rt.snaperr.SnaperrServiceLoader;
+import io.ghostwriter.rt.snaperr.api.SnaperrServiceLoader;
+import io.ghostwriter.rt.snaperr.api.TriggerSerializer;
 
 public class JsonSerializerServiceLoader implements SnaperrServiceLoader<TriggerSerializer> {
 
@@ -20,7 +21,7 @@ public class JsonSerializerServiceLoader implements SnaperrServiceLoader<Trigger
 	    final String gwAppName = configReader.getGwAppName();
 	    final Properties gwProperties = configReader.getGwProperties(gwAppName);
 	    final String moroiAppUUID = gwProperties.getProperty(ConfigurationReader.CFG_MOROI_APP_UUID);
-	    final TriggerSerializer<String> result = new MoroiSerializer(moroiAppUUID);
+	    final TriggerSerializer<String> result = new JsonSerializer(moroiAppUUID);
 	    return triggerSerializer;
 	}
 	else {

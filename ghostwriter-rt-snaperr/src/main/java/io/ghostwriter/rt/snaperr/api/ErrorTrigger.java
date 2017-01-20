@@ -1,8 +1,6 @@
-package io.ghostwriter.rt.snaperr.trigger;
+package io.ghostwriter.rt.snaperr.api;
 
 import java.util.Iterator;
-
-import io.ghostwriter.rt.snaperr.tracker.TrackedScope;
 
 /**
  * Holds information about the program state at the point of error:

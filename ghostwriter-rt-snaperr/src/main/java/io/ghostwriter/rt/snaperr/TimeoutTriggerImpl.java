@@ -1,7 +1,8 @@
-package io.ghostwriter.rt.snaperr.trigger;
+package io.ghostwriter.rt.snaperr;
 
 
-import io.ghostwriter.rt.snaperr.tracker.ReferenceTracker;
+import io.ghostwriter.rt.snaperr.api.ReferenceTracker;
+import io.ghostwriter.rt.snaperr.api.TimeoutTrigger;
 
 import java.util.Objects;
 

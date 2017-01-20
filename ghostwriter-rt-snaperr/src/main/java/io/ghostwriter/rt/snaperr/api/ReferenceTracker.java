@@ -1,4 +1,4 @@
-package io.ghostwriter.rt.snaperr.tracker;
+package io.ghostwriter.rt.snaperr.api;
 
 import java.util.Iterator;
 

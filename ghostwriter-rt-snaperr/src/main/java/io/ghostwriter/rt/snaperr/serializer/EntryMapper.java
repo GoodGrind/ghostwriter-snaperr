@@ -9,26 +9,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import io.ghostwriter.rt.snaperr.moroi.Attributes;
-import io.ghostwriter.rt.snaperr.moroi.Context;
-import io.ghostwriter.rt.snaperr.moroi.ContextData;
-import io.ghostwriter.rt.snaperr.moroi.MoroiEntry;
-import io.ghostwriter.rt.snaperr.moroi.MoroiEntryData;
-import io.ghostwriter.rt.snaperr.moroi.Variable;
-import io.ghostwriter.rt.snaperr.tracker.TrackedScope;
+import io.ghostwriter.rt.snaperr.api.ErrorTrigger;
+import io.ghostwriter.rt.snaperr.api.TrackedScope;
 import io.ghostwriter.rt.snaperr.tracker.TrackedValue;
-import io.ghostwriter.rt.snaperr.trigger.ErrorTrigger;
 
-public class MoroiEntryMapper {
+public class EntryMapper {
 
     private static final String MOROI_MESSAGE_TYPE_EXCEPTION = "exception";
     final private String applicationUUID;
 
-    public MoroiEntryMapper(String applicationUUID) {
+    public EntryMapper(String applicationUUID) {
         this.applicationUUID = applicationUUID;
     }
 
-    public MoroiEntry toMoroiEntry(ErrorTrigger errorTrigger) {
+    public Entry toMoroiEntry(ErrorTrigger errorTrigger) {
         Objects.requireNonNull(errorTrigger);
 
         // FIXME(snorbi07): this needs to be extended to support multiple scopes
@@ -54,8 +48,8 @@ public class MoroiEntryMapper {
 
         representation.setContext(getContext(errorTrigger));
 
-        MoroiEntry moroiEntry = new MoroiEntry();
-        MoroiEntryData moroiEntryData = moroiEntry.getData();
+        Entry moroiEntry = new Entry();
+        EntryData moroiEntryData = moroiEntry.getData();
         moroiEntryData.setType(MOROI_MESSAGE_TYPE_EXCEPTION);
         moroiEntryData.setAttributes(representation);
 

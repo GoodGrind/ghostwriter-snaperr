@@ -2,6 +2,9 @@ package io.ghostwriter.rt.snaperr.tracker;
 
 
 import io.ghostwriter.rt.snaperr.TrackedValueAsserter;
+import io.ghostwriter.rt.snaperr.api.ReferenceTracker;
+import io.ghostwriter.rt.snaperr.api.TrackedScope;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;

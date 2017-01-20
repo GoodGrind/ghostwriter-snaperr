@@ -1,7 +1,8 @@
-package io.ghostwriter.rt.snaperr.trigger;
+package io.ghostwriter.rt.snaperr;
 
-import io.ghostwriter.rt.snaperr.tracker.ReferenceTracker;
-import io.ghostwriter.rt.snaperr.tracker.TrackedScope;
+import io.ghostwriter.rt.snaperr.api.ErrorTrigger;
+import io.ghostwriter.rt.snaperr.api.ReferenceTracker;
+import io.ghostwriter.rt.snaperr.api.TrackedScope;
 
 import java.util.Iterator;
 import java.util.Objects;

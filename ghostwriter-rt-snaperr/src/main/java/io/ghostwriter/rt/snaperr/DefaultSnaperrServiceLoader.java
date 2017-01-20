@@ -1,10 +1,11 @@
 package io.ghostwriter.rt.snaperr;
 
-import io.ghostwriter.rt.snaperr.serializer.TriggerSerializer;
+import io.ghostwriter.rt.snaperr.api.SnaperrServiceLoader;
+import io.ghostwriter.rt.snaperr.api.TriggerSerializer;
 
 /**
  * Default implementation of SnaperrServiceLoader returns null
- * @see io.ghostwriter.rt.snaperr.SnaperrServiceLoader
+ * @see io.ghostwriter.rt.snaperr.api.SnaperrServiceLoader
  */
 public class DefaultSnaperrServiceLoader implements SnaperrServiceLoader<Object> {
 

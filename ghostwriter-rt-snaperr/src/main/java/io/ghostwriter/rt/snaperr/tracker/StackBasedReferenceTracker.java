@@ -3,6 +3,9 @@ package io.ghostwriter.rt.snaperr.tracker;
 
 import java.util.*;
 
+import io.ghostwriter.rt.snaperr.api.ReferenceTracker;
+import io.ghostwriter.rt.snaperr.api.TrackedScope;
+
 public class StackBasedReferenceTracker implements ReferenceTracker {
 
     private ThreadLocal<ScopeStack> trackedThreadStack = new ThreadLocal<ScopeStack>() {

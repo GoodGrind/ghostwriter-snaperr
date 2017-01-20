@@ -1,8 +1,4 @@
-package io.ghostwriter.rt.snaperr.serializer;
-
-
-import io.ghostwriter.rt.snaperr.trigger.ErrorTrigger;
-import io.ghostwriter.rt.snaperr.trigger.TimeoutTrigger;
+package io.ghostwriter.rt.snaperr.api;
 
 public interface TriggerSerializer<T> {
 
@@ -14,7 +10,7 @@ public interface TriggerSerializer<T> {
     T serializeTrigger(ErrorTrigger errorTrigger);
 
     /***
-     * Convert the {@link io.ghostwriter.rt.snaperr.trigger.TimeoutTrigger} instance to a given format
+     * Convert the {@link io.ghostwriter.rt.snaperr.api.TimeoutTrigger} instance to a given format
      * @param timeoutTrigger Instance to be converted
      * @return Serialized format of the  {@link ErrorTrigger} instance
      */

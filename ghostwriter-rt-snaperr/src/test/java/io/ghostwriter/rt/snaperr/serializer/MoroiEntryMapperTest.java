@@ -1,10 +1,9 @@
 package io.ghostwriter.rt.snaperr.serializer;
 
-import io.ghostwriter.rt.snaperr.moroi.ContextData;
-import io.ghostwriter.rt.snaperr.moroi.MoroiEntry;
-import io.ghostwriter.rt.snaperr.tracker.ReferenceTracker;
+import io.ghostwriter.rt.snaperr.api.ErrorTrigger;
+import io.ghostwriter.rt.snaperr.api.ReferenceTracker;
 import io.ghostwriter.rt.snaperr.tracker.StackBasedReferenceTracker;
-import io.ghostwriter.rt.snaperr.trigger.ErrorTrigger;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -30,8 +29,8 @@ public class MoroiEntryMapperTest {
 
         ErrorTrigger errorTrigger = new ErrorTrigger(referenceTracker, throwable);
 
-        MoroiEntryMapper mapper = new MoroiEntryMapper(appUUID);
-        MoroiEntry moroiEntry = mapper.toMoroiEntry(errorTrigger);
+        EntryMapper mapper = new EntryMapper(appUUID);
+        Entry moroiEntry = mapper.toMoroiEntry(errorTrigger);
 
         List<ContextData> contextDataList = moroiEntry.getData().getAttributes().getContext().getData();
 

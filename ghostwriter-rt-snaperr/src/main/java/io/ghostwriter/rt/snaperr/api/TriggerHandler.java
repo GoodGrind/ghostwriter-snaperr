@@ -1,4 +1,4 @@
-package io.ghostwriter.rt.snaperr.trigger;
+package io.ghostwriter.rt.snaperr.api;
 
 /**
  * Called when an unexpected error is triggered by a running thread.

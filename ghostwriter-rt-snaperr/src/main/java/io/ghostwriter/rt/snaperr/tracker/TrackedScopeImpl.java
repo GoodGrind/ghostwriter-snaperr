@@ -3,6 +3,8 @@ package io.ghostwriter.rt.snaperr.tracker;
 
 import java.util.Map;
 
+import io.ghostwriter.rt.snaperr.api.TrackedScope;
+
 final public class TrackedScopeImpl implements TrackedScope {
 
     private Object source;

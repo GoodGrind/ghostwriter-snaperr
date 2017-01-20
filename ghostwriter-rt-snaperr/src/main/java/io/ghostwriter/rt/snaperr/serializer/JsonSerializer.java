@@ -4,14 +4,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import io.ghostwriter.rt.snaperr.moroi.MoroiEntry;
-import io.ghostwriter.rt.snaperr.trigger.ErrorTrigger;
-import io.ghostwriter.rt.snaperr.trigger.TimeoutTrigger;
+
+import io.ghostwriter.rt.snaperr.api.ErrorTrigger;
+import io.ghostwriter.rt.snaperr.api.TimeoutTrigger;
+import io.ghostwriter.rt.snaperr.api.TriggerSerializer;
 
 import java.util.Objects;
 
 // FIXME(snorbi07): needs to be aligned with Moroi format and the impl. refactored
-public class MoroiSerializer implements TriggerSerializer<String> {
+public class JsonSerializer implements TriggerSerializer<String> {
 
     private final Gson gson;
 
@@ -22,11 +23,11 @@ public class MoroiSerializer implements TriggerSerializer<String> {
 
     private final String applicationUUID;
 
-    public MoroiSerializer(String applicationUUID) {
+    public JsonSerializer(String applicationUUID) {
         this(applicationUUID, true, null);
     }
 
-    public MoroiSerializer(String applicationUUID, boolean doPrettyPrint, Integer stackTraceLimit) {
+    public JsonSerializer(String applicationUUID, boolean doPrettyPrint, Integer stackTraceLimit) {
         this.applicationUUID = applicationUUID;
         gson = createGsonInstance(doPrettyPrint);
         if (stackTraceLimit != null && stackTraceLimit < 0) {
@@ -58,8 +59,8 @@ public class MoroiSerializer implements TriggerSerializer<String> {
          * But perhaps does not even matter if we anyways json serialize the scope variables :'(
 		 */
 
-        MoroiEntryMapper moroiEntryMapper = new MoroiEntryMapper(applicationUUID);
-        MoroiEntry moroiEntry = moroiEntryMapper.toMoroiEntry(errorTrigger);
+        EntryMapper moroiEntryMapper = new EntryMapper(applicationUUID);
+        Entry moroiEntry = moroiEntryMapper.toMoroiEntry(errorTrigger);
 
         final JsonElement jsonElement = gson.toJsonTree(moroiEntry.getData());
         final JsonObject jsonObject = new JsonObject();

@@ -7,10 +7,11 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-import io.ghostwriter.rt.snaperr.tracker.TrackedScope;
+import io.ghostwriter.rt.snaperr.api.ErrorTrigger;
+import io.ghostwriter.rt.snaperr.api.TimeoutTrigger;
+import io.ghostwriter.rt.snaperr.api.TrackedScope;
+import io.ghostwriter.rt.snaperr.api.TriggerSerializer;
 import io.ghostwriter.rt.snaperr.tracker.TrackedValue;
-import io.ghostwriter.rt.snaperr.trigger.ErrorTrigger;
-import io.ghostwriter.rt.snaperr.trigger.TimeoutTrigger;
 
 public class StringSerializer implements TriggerSerializer<String> {
 

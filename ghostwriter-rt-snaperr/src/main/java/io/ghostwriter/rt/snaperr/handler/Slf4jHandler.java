@@ -1,10 +1,11 @@
 package io.ghostwriter.rt.snaperr.handler;
 
 import io.ghostwriter.rt.snaperr.SnaperrTracer;
-import io.ghostwriter.rt.snaperr.serializer.TriggerSerializer;
-import io.ghostwriter.rt.snaperr.trigger.ErrorTrigger;
-import io.ghostwriter.rt.snaperr.trigger.TimeoutTrigger;
-import io.ghostwriter.rt.snaperr.trigger.TriggerHandler;
+import io.ghostwriter.rt.snaperr.api.ErrorTrigger;
+import io.ghostwriter.rt.snaperr.api.TimeoutTrigger;
+import io.ghostwriter.rt.snaperr.api.TriggerHandler;
+import io.ghostwriter.rt.snaperr.api.TriggerSerializer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

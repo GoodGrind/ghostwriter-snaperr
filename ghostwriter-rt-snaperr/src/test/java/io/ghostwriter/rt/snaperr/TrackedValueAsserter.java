@@ -1,10 +1,10 @@
 package io.ghostwriter.rt.snaperr;
 
 
+import io.ghostwriter.rt.snaperr.api.ErrorTrigger;
+import io.ghostwriter.rt.snaperr.api.TimeoutTrigger;
+import io.ghostwriter.rt.snaperr.api.TriggerHandler;
 import io.ghostwriter.rt.snaperr.tracker.TrackedValue;
-import io.ghostwriter.rt.snaperr.trigger.ErrorTrigger;
-import io.ghostwriter.rt.snaperr.trigger.TimeoutTrigger;
-import io.ghostwriter.rt.snaperr.trigger.TriggerHandler;
 
 import java.util.Map;
 

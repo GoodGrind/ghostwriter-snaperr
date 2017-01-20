@@ -1,6 +1,6 @@
-package io.ghostwriter.rt.snaperr;
+package io.ghostwriter.rt.snaperr.api;
 
-import io.ghostwriter.rt.snaperr.serializer.TriggerSerializer;
+import io.ghostwriter.rt.snaperr.ConfigurationReader;
 
 /**
  * Load a Snaperr service provided service interface name and Configuration reader

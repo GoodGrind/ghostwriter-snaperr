@@ -3,14 +3,12 @@ package io.ghostwriter.rt.snaperr;
 import java.util.Objects;
 
 import io.ghostwriter.Tracer;
+import io.ghostwriter.rt.snaperr.api.ErrorTrigger;
+import io.ghostwriter.rt.snaperr.api.ReferenceTracker;
+import io.ghostwriter.rt.snaperr.api.TimeoutTrigger;
+import io.ghostwriter.rt.snaperr.api.TriggerHandler;
 import io.ghostwriter.rt.snaperr.handler.Slf4jHandler;
-import io.ghostwriter.rt.snaperr.tracker.ReferenceTracker;
 import io.ghostwriter.rt.snaperr.tracker.StackBasedReferenceTracker;
-import io.ghostwriter.rt.snaperr.trigger.ErrorTrigger;
-import io.ghostwriter.rt.snaperr.trigger.ErrorTriggerImpl;
-import io.ghostwriter.rt.snaperr.trigger.TimeoutTrigger;
-import io.ghostwriter.rt.snaperr.trigger.TimeoutTriggerImpl;
-import io.ghostwriter.rt.snaperr.trigger.TriggerHandler;
 
 public class SnaperrTracer implements Tracer {
 

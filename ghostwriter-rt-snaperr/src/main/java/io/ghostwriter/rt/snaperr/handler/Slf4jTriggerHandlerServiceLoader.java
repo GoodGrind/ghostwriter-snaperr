@@ -3,9 +3,9 @@ package io.ghostwriter.rt.snaperr.handler;
 import java.util.Properties;
 
 import io.ghostwriter.rt.snaperr.ConfigurationReader;
-import io.ghostwriter.rt.snaperr.SnaperrServiceLoader;
-import io.ghostwriter.rt.snaperr.serializer.TriggerSerializer;
-import io.ghostwriter.rt.snaperr.trigger.TriggerHandler;
+import io.ghostwriter.rt.snaperr.api.SnaperrServiceLoader;
+import io.ghostwriter.rt.snaperr.api.TriggerHandler;
+import io.ghostwriter.rt.snaperr.api.TriggerSerializer;
 
 /**
  * Load the {@link Slf4jHandler}

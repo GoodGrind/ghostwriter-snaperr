@@ -1,6 +1,6 @@
-package io.ghostwriter.rt.snaperr.moroi;
+package io.ghostwriter.rt.snaperr.serializer;
 
-public class MoroiEntryData {
+public class EntryData {
 
     private String type;
     private Attributes attributes = new Attributes();

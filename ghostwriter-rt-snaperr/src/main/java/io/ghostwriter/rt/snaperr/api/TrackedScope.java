@@ -1,7 +1,9 @@
-package io.ghostwriter.rt.snaperr.tracker;
+package io.ghostwriter.rt.snaperr.api;
 
 
 import java.util.Map;
+
+import io.ghostwriter.rt.snaperr.tracker.TrackedValue;
 
 /**
  * Keeps info about one scope (i.e. one method call):

@@ -1,4 +1,4 @@
-package io.ghostwriter.rt.snaperr.moroi;
+package io.ghostwriter.rt.snaperr.serializer;
 
 /*
  * 

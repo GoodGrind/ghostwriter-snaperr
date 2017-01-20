@@ -2,6 +2,8 @@ package io.ghostwriter.rt.snaperr.tracker;
 
 import java.util.*;
 
+import io.ghostwriter.rt.snaperr.api.TrackedScope;
+
 /**
  * Stack implementation holding {@link TrackedScope} instances. Upon
  * {@link #pop()} the stack does not remove the TrackedScope instance from the
