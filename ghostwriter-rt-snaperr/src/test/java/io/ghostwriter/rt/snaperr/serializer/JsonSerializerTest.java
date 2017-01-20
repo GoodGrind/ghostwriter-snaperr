@@ -27,7 +27,7 @@ public class JsonSerializerTest {
         final boolean doPrettyPrint = false;
         final int stackTraceLimit = 1;
         final String appName = "appName";
-        final JsonSerializer jsonSerializer = new JsonSerializer(appName, doPrettyPrint, stackTraceLimit);
+        final MoroiSerializer jsonSerializer = new MoroiSerializer(appName, doPrettyPrint, stackTraceLimit);
 
         Throwable throwable = new IllegalArgumentException("someError");
         ReferenceTracker referenceTracker = new StackBasedReferenceTracker();
@@ -49,7 +49,7 @@ public class JsonSerializerTest {
         final boolean doPrettyPrint = false;
         final int stackTraceLimit = 1;
         final String appName = "appName";
-        final JsonSerializer jsonSerializer = new JsonSerializer(appName, doPrettyPrint, stackTraceLimit);
+        final MoroiSerializer jsonSerializer = new MoroiSerializer(appName, doPrettyPrint, stackTraceLimit);
 
         Throwable throwable = new IllegalArgumentException("someError");
         ReferenceTracker referenceTracker = new StackBasedReferenceTracker();

@@ -2,7 +2,7 @@ package io.ghostwriter.rt.snaperr.handler;
 
 import io.ghostwriter.rt.snaperr.SnaperrTracer;
 import io.ghostwriter.rt.snaperr.Logger;
-import io.ghostwriter.rt.snaperr.serializer.JsonSerializer;
+import io.ghostwriter.rt.snaperr.serializer.MoroiSerializer;
 import io.ghostwriter.rt.snaperr.serializer.TriggerSerializer;
 import io.ghostwriter.rt.snaperr.tracker.ReferenceTracker;
 import io.ghostwriter.rt.snaperr.tracker.StackBasedReferenceTracker;
@@ -63,7 +63,7 @@ public class MoroiHandler implements TriggerHandler {
         System.out.println("moroiAppUUID: " + moroiAppUUID);
         System.out.println("noSslHostnameVerification: " + noSslHostnameVerification);
 
-        JsonSerializer serializer2 = new JsonSerializer(moroiAppUUID);
+        MoroiSerializer serializer2 = new MoroiSerializer(moroiAppUUID);
         MoroiHandler moroiHandler = new MoroiHandler(moroiUrl, serializer2, noSslHostnameVerification);
         final ReferenceTracker referenceTracker = new StackBasedReferenceTracker();
         SnaperrTracer ghostWriterSnaperr = new SnaperrTracer(referenceTracker, moroiHandler, -1L, -1);

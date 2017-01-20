@@ -20,7 +20,7 @@ public class JsonSerializerServiceLoader implements SnaperrServiceLoader<Trigger
 	    final String gwAppName = configReader.getGwAppName();
 	    final Properties gwProperties = configReader.getGwProperties(gwAppName);
 	    final String moroiAppUUID = gwProperties.getProperty(ConfigurationReader.CFG_MOROI_APP_UUID);
-	    final TriggerSerializer<String> result = new JsonSerializer(moroiAppUUID);
+	    final TriggerSerializer<String> result = new MoroiSerializer(moroiAppUUID);
 	    return triggerSerializer;
 	}
 	else {

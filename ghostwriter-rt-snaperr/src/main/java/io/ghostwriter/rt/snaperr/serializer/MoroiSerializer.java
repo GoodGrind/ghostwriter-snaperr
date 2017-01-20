@@ -11,7 +11,7 @@ import io.ghostwriter.rt.snaperr.trigger.TimeoutTrigger;
 import java.util.Objects;
 
 // FIXME(snorbi07): needs to be aligned with Moroi format and the impl. refactored
-public class JsonSerializer implements TriggerSerializer<String> {
+public class MoroiSerializer implements TriggerSerializer<String> {
 
     private final Gson gson;
 
@@ -22,11 +22,11 @@ public class JsonSerializer implements TriggerSerializer<String> {
 
     private final String applicationUUID;
 
-    public JsonSerializer(String applicationUUID) {
+    public MoroiSerializer(String applicationUUID) {
         this(applicationUUID, true, null);
     }
 
-    public JsonSerializer(String applicationUUID, boolean doPrettyPrint, Integer stackTraceLimit) {
+    public MoroiSerializer(String applicationUUID, boolean doPrettyPrint, Integer stackTraceLimit) {
         this.applicationUUID = applicationUUID;
         gson = createGsonInstance(doPrettyPrint);
         if (stackTraceLimit != null && stackTraceLimit < 0) {

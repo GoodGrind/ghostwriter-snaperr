@@ -4,7 +4,7 @@ import java.util.Properties;
 
 import io.ghostwriter.rt.snaperr.ConfigurationReader;
 import io.ghostwriter.rt.snaperr.SnaperrServiceLoader;
-import io.ghostwriter.rt.snaperr.serializer.JsonSerializer;
+import io.ghostwriter.rt.snaperr.serializer.MoroiSerializer;
 import io.ghostwriter.rt.snaperr.serializer.TriggerSerializer;
 import io.ghostwriter.rt.snaperr.trigger.TriggerHandler;
 
