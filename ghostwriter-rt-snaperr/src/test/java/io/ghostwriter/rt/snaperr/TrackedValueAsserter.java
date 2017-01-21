@@ -1,9 +1,5 @@
 package io.ghostwriter.rt.snaperr;
 
-
-import io.ghostwriter.rt.snaperr.api.ErrorTrigger;
-import io.ghostwriter.rt.snaperr.api.TimeoutTrigger;
-import io.ghostwriter.rt.snaperr.api.TriggerHandler;
 import io.ghostwriter.rt.snaperr.tracker.TrackedValue;
 
 import java.util.Map;
@@ -33,21 +29,6 @@ public class TrackedValueAsserter {
         // Verify value correctness
         assertTrue("Expected value of '" + variableName + "' is '" + expectedVariableValue + "', got: " + valueOfVariable,
                 valueOfVariable.equals(expectedVariableValue));
-    }
-
-    // used to initialize GhostWriterSnaperr with a handler that does not have runtime dependency requirements like the SLF4J handler.
-    public static TriggerHandler noopTriggerHandler() {
-        return new TriggerHandler() {
-            @Override
-            public void onError(ErrorTrigger errorTrigger) {
-                return;
-            }
-
-            @Override
-            public void onTimeout(TimeoutTrigger timeoutTrigger) {
-                return;
-            }
-        };
     }
 
 }

@@ -1,9 +1,12 @@
 package io.ghostwriter.rt.snaperr;
 
 import io.ghostwriter.rt.snaperr.api.ErrorTrigger;
+import io.ghostwriter.rt.snaperr.api.ReferenceTracker;
 import io.ghostwriter.rt.snaperr.api.TimeoutTrigger;
 import io.ghostwriter.rt.snaperr.api.TrackedScope;
 import io.ghostwriter.rt.snaperr.api.TriggerHandler;
+import io.ghostwriter.rt.snaperr.api.TriggerSerializer;
+import io.ghostwriter.rt.snaperr.tracker.StackBasedReferenceTracker;
 import io.ghostwriter.rt.snaperr.tracker.TrackedValue;
 
 import org.junit.Test;
@@ -19,8 +22,11 @@ public class ParallelSnaperrTest {
 
     @Test
     public void testStateConflict() {
-        final ParallelTriggerHandler parallelTriggerHandler = new ParallelTriggerHandler();
-        final SnaperrTracer gwErrMon = new SnaperrTracer(parallelTriggerHandler);
+        final ParallelTriggerSerializer parallelTriggerSerializer = new ParallelTriggerSerializer();
+        ReferenceTracker referenceTracker = new StackBasedReferenceTracker();
+	
+        TriggerHandler<?> noopTriggerHandler = new NoopTriggerHandler();
+	final SnaperrTracer gwErrMon = new SnaperrTracer(referenceTracker, parallelTriggerSerializer, noopTriggerHandler, -1L, -1);
 
         // We need to make sure that  2 threads are executed at the "same time".
         // This way we can assure the timing from the main thread. Hence the 3 threads instead of 2.
@@ -68,7 +74,7 @@ public class ParallelSnaperrTest {
             // wait for them to finish, then do some verification
             thread1.join();
             thread2.join();
-            final boolean allErrorsHandled = parallelTriggerHandler.bothThreadErrorsHandled();
+            final boolean allErrorsHandled = parallelTriggerSerializer.bothThreadErrorsHandled();
             assertTrue("One or more errors were not handled in parallel!", allErrorsHandled);
         } catch (Exception e) {
             assertTrue("Unexpected exception: " + e, e != null);
@@ -76,16 +82,16 @@ public class ParallelSnaperrTest {
 
 
     }
-
-    static private class ParallelTriggerHandler implements TriggerHandler {
+    
+    static private class ParallelTriggerSerializer implements TriggerSerializer<String> {
 
         private AtomicBoolean thread1ErrorProcessed = new AtomicBoolean(false);
 
         private AtomicBoolean thread2ErrorProcessed = new AtomicBoolean(false);
 
-        @Override
-        public void onError(ErrorTrigger errorTrigger) {
-            final TrackedScope topLevelScope = errorTrigger.getReferenceTracker().currentScope();
+	@Override
+	public String serializeTrigger(ErrorTrigger errorTrigger) {
+            final TrackedScope topLevelScope = errorTrigger.currentScope();
             if ("thread1".equals(topLevelScope.getMethodName())) {
                 Map<String, TrackedValue> watched = topLevelScope.getReferences();
 
@@ -104,20 +110,23 @@ public class ParallelSnaperrTest {
 
                 thread2ErrorProcessed.compareAndSet(false, true);
             }
-        }
+            
+            return "";
+	}
 
-        @Override
-        public void onTimeout(TimeoutTrigger timeoutTrigger) {
-            assertFalse("this method should not be called it this test case", true);
-        }
+	@Override
+	public String serializeTrigger(TimeoutTrigger timeoutTrigger) {
+	    assertFalse("this method should not be called it this test case", true);
+	    return "";
+	}
 
         public boolean bothThreadErrorsHandled() {
             final boolean thread1Processed = thread1ErrorProcessed.get();
             final boolean thread2Processed = thread2ErrorProcessed.get();
-
+    
             return thread1Processed && thread2Processed;
         }
-
+	
     }
 
 }

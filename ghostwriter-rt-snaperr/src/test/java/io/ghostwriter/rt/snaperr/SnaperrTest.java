@@ -5,10 +5,13 @@ import io.ghostwriter.rt.snaperr.api.ReferenceTracker;
 import io.ghostwriter.rt.snaperr.api.TimeoutTrigger;
 import io.ghostwriter.rt.snaperr.api.TrackedScope;
 import io.ghostwriter.rt.snaperr.api.TriggerHandler;
+import io.ghostwriter.rt.snaperr.api.TriggerSerializer;
+import io.ghostwriter.rt.snaperr.tracker.StackBasedReferenceTracker;
 import io.ghostwriter.rt.snaperr.tracker.TrackedValue;
 
 import org.junit.Test;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
@@ -21,10 +24,10 @@ public class SnaperrTest {
         final String METHOD_NAME = "testTriggerCreation";
         final Object expectedContext = this;
 
-        SnaperrTracer gwErrMon = new SnaperrTracer(new TriggerHandler() {
+        TriggerSerializer<String> triggerSerializer = new TriggerSerializer<String>() {
             @Override
-            public void onError(ErrorTrigger trigger) {
-                final TrackedScope topLevelScope = trigger.getReferenceTracker().currentScope();
+            public String serializeTrigger(ErrorTrigger trigger) {
+                final TrackedScope topLevelScope = trigger.currentScope();
                 assertTrackedScope(topLevelScope);
 
                 Throwable throwable = trigger.getThrowable();
@@ -32,10 +35,12 @@ public class SnaperrTest {
                 Class<IllegalArgumentException> expectedErrorType = IllegalArgumentException.class;
                 assertTrue("Expected error type: '" + expectedErrorType.getName() + "', got: " + errorClassName,
                         throwable instanceof IllegalArgumentException);
+                
+                return "";
             }
 
             @Override
-            public void onTimeout(TimeoutTrigger timeoutTrigger) {
+            public String serializeTrigger(TimeoutTrigger timeoutTrigger) {
                 final TrackedScope topLevelScope = timeoutTrigger.getReferenceTracker().currentScope();
                 assertTrackedScope(topLevelScope);
 
@@ -44,6 +49,8 @@ public class SnaperrTest {
 
                 final long timeout = timeoutTrigger.getTimeout();
                 assertTrue("Expected 'timeout' value of 2000L, got: " + timeout, timeout == 2000L);
+                
+                return "";
             }
 
             private void assertTrackedScope(TrackedScope trackedScope) {
@@ -62,7 +69,9 @@ public class SnaperrTest {
                 TrackedValueAsserter.assertTrackedValue(watched, "q", 7);
             }
 
-        });
+        };
+        
+        SnaperrTracer gwErrMon = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), -1L, -1);
 
         gwErrMon.entering(this, METHOD_NAME);
         int x = 42;
@@ -77,23 +86,27 @@ public class SnaperrTest {
     @Test
     public void testTrackedPrimitiveValueUpdate() {
         final String METHOD_NAME = "testTrackedPrimitiveValueUpdate";
-        SnaperrTracer gwErrMon = new SnaperrTracer(new TriggerHandler() {
+        TriggerSerializer<String> triggerSerializer = new TriggerSerializer<String>() {
             @Override
-            public void onError(ErrorTrigger trigger) {
-                final TrackedScope topLevelScope = trigger.getReferenceTracker().currentScope();
+            public String serializeTrigger(ErrorTrigger trigger) {
+                final TrackedScope topLevelScope = trigger.currentScope();
                 Map<String, TrackedValue> watched = topLevelScope.getReferences();
 
                 assertTrue("Expected number of watched variables: 1, got: " + watched.size(),
                         watched.size() == 1);
 
                 TrackedValueAsserter.assertTrackedValue(watched, "y", 2);
+                return "";
             }
 
             @Override
-            public void onTimeout(TimeoutTrigger timeoutTrigger) {
+            public String serializeTrigger(TimeoutTrigger timeoutTrigger) {
                 assertFalse("this should not be called in this test case", true);
+                return "";
             }
-        });
+        };
+        
+        SnaperrTracer gwErrMon = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), -1L, -1);
 
         gwErrMon.entering("this", METHOD_NAME);
         gwErrMon.valueChange(this, METHOD_NAME, "y", 1);
@@ -106,10 +119,10 @@ public class SnaperrTest {
         final String METHOD_NAME = "testTrackedMutableObjectStateChange";
 
         final MutableValueClass mvc = new MutableValueClass("this is a String", 981);
-        SnaperrTracer gwErrMon = new SnaperrTracer(new TriggerHandler() {
+        TriggerSerializer<String> triggerSerializer = new TriggerSerializer<String>() {
             @Override
-            public void onError(ErrorTrigger trigger) {
-                final TrackedScope topLevelScope = trigger.getReferenceTracker().currentScope();
+            public String serializeTrigger(ErrorTrigger trigger) {
+                final TrackedScope topLevelScope = trigger.currentScope();
                 Map<String, TrackedValue> watched = topLevelScope.getReferences();
 
                 assertTrue("Expected number of watched variables: 1, got: " + watched.size(),
@@ -119,14 +132,18 @@ public class SnaperrTest {
 
                 TrackedValue capturedMvc = watched.get("mvc");
                 assertTrue("Got different instance!", mvc == capturedMvc.getValue());
+                return "";
             }
 
             @Override
-            public void onTimeout(TimeoutTrigger timeoutTrigger) {
+            public String serializeTrigger(TimeoutTrigger timeoutTrigger) {
                 assertFalse("this should not be called in this test case", true);
+                return "";
             }
-        });
-
+        };
+        
+        SnaperrTracer gwErrMon = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), -1L, -1);
+        
         gwErrMon.entering(this, METHOD_NAME);
         gwErrMon.valueChange(this, METHOD_NAME, "mvc", mvc);
         mvc.setPrimitiveValue(314);
@@ -136,23 +153,28 @@ public class SnaperrTest {
     @Test
     public void testTrackedReferenceChange() {
         final String METHOD_NAME = "testTrackedReferenceChange";
-        SnaperrTracer gwErrMon = new SnaperrTracer(new TriggerHandler() {
+        TriggerSerializer<String> triggerSerializer = new TriggerSerializer<String>() {
             @Override
-            public void onError(ErrorTrigger trigger) {
-                final TrackedScope topLevelScope = trigger.getReferenceTracker().currentScope();
+            public String serializeTrigger(ErrorTrigger trigger) {
+                final TrackedScope topLevelScope = trigger.currentScope();
                 Map<String, TrackedValue> watched = topLevelScope.getReferences();
 
                 assertTrue("Expected number of watched variables: 1, got: " + watched.size(),
                         watched.size() == 1);
 
                 TrackedValueAsserter.assertTrackedValue(watched, "mvc", new MutableValueClass("second", 2));
+                return "";
             }
 
             @Override
-            public void onTimeout(TimeoutTrigger timeoutTrigger) {
+            public String serializeTrigger(TimeoutTrigger timeoutTrigger) {
                 assertFalse("this should not be called in this test case", true);
+                return "";
             }
-        });
+        };
+        
+
+        SnaperrTracer gwErrMon = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), -1L, -1);
 
         MutableValueClass mvc = new MutableValueClass("first", 1);
         gwErrMon.entering(this, METHOD_NAME);
@@ -164,23 +186,27 @@ public class SnaperrTest {
 
     @Test
     public void testTrackedScope() {
-        SnaperrTracer gwSnaperr = new SnaperrTracer(new TriggerHandler() {
+	TriggerSerializer<String> triggerSerializer = new TriggerSerializer<String>() {
             @Override
-            public void onError(ErrorTrigger trigger) {
-                final TrackedScope topLevelScope = trigger.getReferenceTracker().currentScope();
+            public String serializeTrigger(ErrorTrigger trigger) {
+                final TrackedScope topLevelScope = trigger.currentScope();
                 Map<String, TrackedValue> watched = topLevelScope.getReferences();
 
                 assertTrue("Expected number of watched variables: 1, got: " + watched.size(),
                         watched.size() == 1);
 
                 TrackedValueAsserter.assertTrackedValue(watched, "b", 2);
+                return "";
             }
 
             @Override
-            public void onTimeout(TimeoutTrigger timeoutTrigger) {
+            public String serializeTrigger(TimeoutTrigger timeoutTrigger) {
                 assertFalse("this should not be called in this test case", true);
+                return "";
             }
-        });
+        };
+
+        SnaperrTracer gwSnaperr = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), -1L, -1);
 
         gwSnaperr.entering(this, "methodX");
         gwSnaperr.valueChange(this, "methodX", "a", 1);
@@ -211,10 +237,10 @@ public class SnaperrTest {
             }
          */
 
-        SnaperrTracer gwSnaperr = new SnaperrTracer(new TriggerHandler() {
+        TriggerSerializer<String> triggerSerializer = new TriggerSerializer<String>() {
             @Override
-            public void onError(ErrorTrigger trigger) {
-                final TrackedScope topLevelScope = trigger.getReferenceTracker().currentScope();
+            public String serializeTrigger(ErrorTrigger trigger) {
+                final TrackedScope topLevelScope = trigger.currentScope();
                 final String methodName = topLevelScope.getMethodName();
                 boolean isCallerMethod = "method1".equals(methodName) || "method2".equals(methodName);
                 assertFalse("Caller method triggered on error!", isCallerMethod);
@@ -223,13 +249,17 @@ public class SnaperrTest {
                 Map<String, TrackedValue> watched = topLevelScope.getReferences();
                 TrackedValueAsserter.assertNumberOfTrackedVariables(watched, 1);
                 TrackedValueAsserter.assertTrackedValue(watched, "z", 3);
+                return "";
             }
 
             @Override
-            public void onTimeout(TimeoutTrigger timeoutTrigger) {
+            public String serializeTrigger(TimeoutTrigger timeoutTrigger) {
                 assertFalse("this should not be called in this test case", true);
+                return "";
             }
-        });
+        };
+        
+        SnaperrTracer gwSnaperr = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), -1L, -1);
 
         gwSnaperr.entering(this, "method1");
         gwSnaperr.valueChange(this, "method1", "x", 1);
@@ -267,8 +297,8 @@ public class SnaperrTest {
             }
          */
 
-        final ExceptionRethrowHandler triggerHandler = new ExceptionRethrowHandler();
-        SnaperrTracer gwSnaperr = new SnaperrTracer(triggerHandler);
+        final ExceptionRethrowSerializer exceptionRethrowSerializer = new ExceptionRethrowSerializer();
+        SnaperrTracer gwSnaperr = new SnaperrTracer(new StackBasedReferenceTracker(), exceptionRethrowSerializer, new NoopTriggerHandler(), -1L, -1);
 
         gwSnaperr.entering(this, "method1");
         gwSnaperr.valueChange(this, "method1", "x", 1);
@@ -285,8 +315,8 @@ public class SnaperrTest {
         gwSnaperr.onError(this, "method1", rethrownException);
         gwSnaperr.exiting(this, "method1");
 
-        assertTrue("expected '2' error events, got: '" + triggerHandler.getNumberOfErrorEvents() + "'",
-                triggerHandler.getNumberOfErrorEvents() == 2);
+        assertTrue("expected '2' error events, got: '" + exceptionRethrowSerializer.getNumberOfErrorEvents() + "'",
+        	exceptionRethrowSerializer.getNumberOfErrorEvents() == 2);
     }
 
     @Test
@@ -307,12 +337,11 @@ public class SnaperrTest {
 
          */
 
-        SnaperrTracer gwSnapper = new SnaperrTracer(new TriggerHandler() {
+        TriggerSerializer<String> triggerSerializer = new TriggerSerializer<String>() {
 
             @Override
-            public void onError(ErrorTrigger errorTrigger) {
-                final ReferenceTracker referenceTracker = errorTrigger.getReferenceTracker();
-                final TrackedScope trackedScope = referenceTracker.currentScope();
+            public String serializeTrigger(ErrorTrigger errorTrigger) {
+                final TrackedScope trackedScope = errorTrigger.currentScope();
                 final String methodName = trackedScope.getMethodName();
                 assertTrue("Expected method name 'method1', got: " + methodName, "method1".equals(methodName));
                 final Map<String, TrackedValue> watched = trackedScope.getReferences();
@@ -320,14 +349,17 @@ public class SnaperrTest {
                 TrackedValueAsserter.assertTrackedValue(watched, "x", 12);
                 TrackedValueAsserter.assertTrackedValue(watched, "y", 114);
                 TrackedValueAsserter.assertTrackedValue(watched, "z", 212);
+                return "";
             }
 
             @Override
-            public void onTimeout(TimeoutTrigger timeoutTrigger) {
+            public String serializeTrigger(TimeoutTrigger timeoutTrigger) {
                 assertFalse("this should not be called in this test case!", false);
+                return "";
             }
-        }
-        );
+        };
+        
+        SnaperrTracer gwSnapper = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), -1L, -1);
 
         gwSnapper.entering(this, "method1");
         gwSnapper.valueChange(this, "method1", "x", 12);
@@ -343,13 +375,12 @@ public class SnaperrTest {
         // It can happen that we call a GW instrumented function during Trigger processing, for example toString method of a POJO.
         // The implementation should be robust and handle this as well.
 
-        final SnaperrTracer gwSnapper = new SnaperrTracer(TrackedValueAsserter.noopTriggerHandler());
-        final TriggerHandler triggerHandler = new TriggerHandler() {
+	final DelegatingGwTracer delegatingGwSnapper = new DelegatingGwTracer();
+        final TriggerSerializer<String> triggerSerializer = new TriggerSerializer<String>() {
             @Override
-            public void onError(ErrorTrigger errorTrigger) {
-                final ReferenceTracker referenceTracker = errorTrigger.getReferenceTracker();
-
-                final TrackedScope trackedScopeBefore = referenceTracker.currentScope();
+            public String serializeTrigger(ErrorTrigger errorTrigger) {
+                	
+                final TrackedScope trackedScopeBefore = errorTrigger.currentScope();
                 final Map<String, TrackedValue> watchedBefore = trackedScopeBefore.getReferences();
                 TrackedValueAsserter.assertNumberOfTrackedVariables(watchedBefore, 2);
                 TrackedValueAsserter.assertTrackedValue(watchedBefore, "ten", 10);
@@ -357,30 +388,33 @@ public class SnaperrTest {
 
                 // simulation of a use case where we would serialize a watched POJO that is instrumented
                 // the runtime needs to be able to handle such use cases
-                gwSnapper.entering(this, "breadcrumbs");
-                gwSnapper.valueChange(this, "breadcrumbs", "aww", "yiss");
+                delegatingGwSnapper.entering(this, "breadcrumbs");
+                delegatingGwSnapper.valueChange(this, "breadcrumbs", "aww", "yiss");
                 // ensure that if a processing is triggered, the state is not affected until the current processing is done
-                final TrackedScope scopeDuringProcessing = referenceTracker.currentScope();
+                final TrackedScope scopeDuringProcessing = errorTrigger.currentScope();
                 final Map<String, TrackedValue> watchedDuringProcessing = scopeDuringProcessing.getReferences();
                 TrackedValueAsserter.assertNumberOfTrackedVariables(watchedDuringProcessing, 2);
                 TrackedValueAsserter.assertTrackedValue(watchedBefore, "ten", 10);
                 TrackedValueAsserter.assertTrackedValue(watchedBefore, "zero", 0);
-                gwSnapper.exiting(this, "breadcrumbs");
+                delegatingGwSnapper.exiting(this, "breadcrumbs");
 
-                final TrackedScope trackedScopeAfter = referenceTracker.currentScope();
+                final TrackedScope trackedScopeAfter = errorTrigger.currentScope();
                 final Map<String, TrackedValue> watchedAfter = trackedScopeAfter.getReferences();
                 TrackedValueAsserter.assertNumberOfTrackedVariables(watchedAfter, 2);
                 TrackedValueAsserter.assertTrackedValue(watchedBefore, "ten", 10);
                 TrackedValueAsserter.assertTrackedValue(watchedBefore, "zero", 0);
+                return "";
             }
 
             @Override
-            public void onTimeout(TimeoutTrigger timeoutTrigger) {
+            public String serializeTrigger(TimeoutTrigger timeoutTrigger) {
                 assertFalse("this should not be called in this test case!", false);
+                return "";
             }
         };
         // the 2 step trigger setting is required because otherwise we could not reference the gwSnapper in the handler itself
-        gwSnapper.setTriggerHandler(triggerHandler);
+        SnaperrTracer gwSnapper = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), -1L, -1);
+        delegatingGwSnapper.setOtherTracer(gwSnapper);
 
         gwSnapper.entering(this, "tenPerZero");
         gwSnapper.valueChange(this, "tenPerZero", "ten", 10);
@@ -390,46 +424,50 @@ public class SnaperrTest {
 
     @Test
     public void testErrorEventDuringTriggerProcessing() {
-        // It can happen that we call a GW instrumented function during Trigger processing that also triggers an error, for example circular serialization
+        // It can happen that we call a GW instrumented function during Trigger 
+	// processing that also triggers an error, for example circular serialization
 
-        final SnaperrTracer gwSnapper = new SnaperrTracer(TrackedValueAsserter.noopTriggerHandler());
-        final TriggerHandler triggerHandler = new TriggerHandler() {
+        final DelegatingGwTracer delegatingGwSnapper = new DelegatingGwTracer();
+        final TriggerSerializer<String> triggerSerializer = new TriggerSerializer<String>() {
             @Override
-            public void onError(ErrorTrigger errorTrigger) {
-                final ReferenceTracker referenceTracker = errorTrigger.getReferenceTracker();
-
-                final TrackedScope trackedScopeBefore = referenceTracker.currentScope();
+            public String serializeTrigger(ErrorTrigger errorTrigger) {
+                final TrackedScope trackedScopeBefore = errorTrigger.currentScope();
                 final Map<String, TrackedValue> watchedBefore = trackedScopeBefore.getReferences();
                 TrackedValueAsserter.assertNumberOfTrackedVariables(watchedBefore, 2);
                 TrackedValueAsserter.assertTrackedValue(watchedBefore, "a", 5);
                 TrackedValueAsserter.assertTrackedValue(watchedBefore, "b", 6);
 
                 // simulation of a use case where we have a potential error during trigger processing
-                gwSnapper.entering(this, "bird");
-                gwSnapper.valueChange(this, "bird", "pig", "grass");
-                gwSnapper.onError(this, "bird", new NullPointerException());
+                delegatingGwSnapper.entering(this, "bird");
+                delegatingGwSnapper.valueChange(this, "bird", "pig", "grass");
+                delegatingGwSnapper.onError(this, "bird", new NullPointerException());
                 // ensure that if a processing is triggered, the state is not affected until the current processing is done
-                final TrackedScope scopeDuringProcessing = referenceTracker.currentScope();
+                final TrackedScope scopeDuringProcessing = errorTrigger.currentScope();
                 final Map<String, TrackedValue> watchedDuringProcessing = scopeDuringProcessing.getReferences();
                 TrackedValueAsserter.assertNumberOfTrackedVariables(watchedDuringProcessing, 2);
                 TrackedValueAsserter.assertTrackedValue(watchedBefore, "a", 5);
                 TrackedValueAsserter.assertTrackedValue(watchedBefore, "b", 6);
-                gwSnapper.exiting(this, "bird");
+                delegatingGwSnapper.exiting(this, "bird");
 
-                final TrackedScope trackedScopeAfter = referenceTracker.currentScope();
+                final TrackedScope trackedScopeAfter = errorTrigger.currentScope();
                 final Map<String, TrackedValue> watchedAfter = trackedScopeAfter.getReferences();
                 TrackedValueAsserter.assertNumberOfTrackedVariables(watchedAfter, 2);
                 TrackedValueAsserter.assertTrackedValue(watchedBefore, "a", 5);
                 TrackedValueAsserter.assertTrackedValue(watchedBefore, "b", 6);
+                return "";
             }
 
             @Override
-            public void onTimeout(TimeoutTrigger timeoutTrigger) {
+            public String serializeTrigger(TimeoutTrigger timeoutTrigger) {
                 assertFalse("this should not be called in this test case!", false);
+                return "";
             }
         };
+        
+        SnaperrTracer gwSnapper = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), -1L, -1);
+        delegatingGwSnapper.setOtherTracer(gwSnapper);
+        
         // the 2 step trigger setting is required because otherwise we could not reference the gwSnapper in the handler itself
-        gwSnapper.setTriggerHandler(triggerHandler);
 
         gwSnapper.entering(this, "method1");
         gwSnapper.valueChange(this, "method1", "a", 5);
@@ -440,7 +478,7 @@ public class SnaperrTest {
     @Test
     public void testWatchedStackUnwinding() {
         /*
-            In case of nested method calls, when an error occuers we should be able to access watched values from callers
+            In case of nested method calls, when an error occurs we should be able to access watched values from callers
 
             method1() {
                 a = 1
@@ -457,12 +495,15 @@ public class SnaperrTest {
             }
          */
 
-        SnaperrTracer gwSnaperr = new SnaperrTracer(new TriggerHandler() {
+        	
+        TriggerSerializer<String> triggerSerializer = new TriggerSerializer<String>() {
+        	    
             @Override
-            public void onError(ErrorTrigger trigger) {
-                final ReferenceTracker referenceTracker = trigger.getReferenceTracker();
+            public String serializeTrigger(ErrorTrigger trigger) {
+        	Iterator<TrackedScope> trackedScopeIterator = trigger.getTrackedScopeIterator();
+        	
                 // method3 scope
-                TrackedScope currentScope = referenceTracker.currentScope();
+                TrackedScope currentScope = trackedScopeIterator.next();
                 String methodName = currentScope.getMethodName();
                 assertTrue("expected 'method3', got: '" + methodName + "'", "method3".equals(methodName));
                 Map<String, TrackedValue> references = currentScope.getReferences();
@@ -472,8 +513,7 @@ public class SnaperrTest {
                 TrackedValueAsserter.assertTrackedValue(references, "e", 5);
 
                 // method2 scope
-                referenceTracker.popScope();
-                currentScope = referenceTracker.currentScope();
+                currentScope = trackedScopeIterator.next();
                 methodName = currentScope.getMethodName();
                 assertTrue("expected 'method2', got: '" + methodName + "'", "method2".equals(methodName));
                 references = currentScope.getReferences();
@@ -482,8 +522,7 @@ public class SnaperrTest {
                 TrackedValueAsserter.assertTrackedValue(references, "c", 3);
 
                 // method1 scope
-                referenceTracker.popScope();
-                currentScope = referenceTracker.currentScope();
+                currentScope = trackedScopeIterator.next();
                 methodName = currentScope.getMethodName();
                 assertTrue("expected 'method1', got: '" + methodName + "'", "method1".equals(methodName));
                 references = currentScope.getReferences();
@@ -491,15 +530,23 @@ public class SnaperrTest {
                 TrackedValueAsserter.assertTrackedValue(references, "b", 2);
                 TrackedValueAsserter.assertTrackedValue(references, "a", 1);
 
-                referenceTracker.popScope();
-                assertTrue("additional stack entries present", referenceTracker.isEmpty());
+                
+                assertFalse("additional stack entries present", trackedScopeIterator.hasNext());
+                
+                return "";
             }
 
             @Override
-            public void onTimeout(TimeoutTrigger timeoutTrigger) {
+            public String serializeTrigger(TimeoutTrigger timeoutTrigger) {
                 assertFalse("this should not be called in this test case", true);
+                return "";
             }
-        });
+        };
+        
+
+        ReferenceTracker referenceTracker = new StackBasedReferenceTracker();
+        TriggerHandler<String> noopTriggerHandler = new NoopTriggerHandler();
+	SnaperrTracer gwSnaperr = new SnaperrTracer(referenceTracker, triggerSerializer, noopTriggerHandler, -1L, -1); 
 
         gwSnaperr.entering(this, "method1");
         gwSnaperr.valueChange(this, "method1", "a", 1);
@@ -514,7 +561,7 @@ public class SnaperrTest {
         gwSnaperr.onError(this, "method3", new NullPointerException());
     }
 
-    private static class ExceptionRethrowHandler implements TriggerHandler {
+    private static class ExceptionRethrowSerializer implements TriggerSerializer<String> {
 
         private int numberOfErrorEvents = 0;
 
@@ -523,8 +570,8 @@ public class SnaperrTest {
         }
 
         @Override
-        public void onError(ErrorTrigger trigger) {
-            final TrackedScope topLevelScope = trigger.getReferenceTracker().currentScope();
+        public String serializeTrigger(ErrorTrigger trigger) {
+            final TrackedScope topLevelScope = trigger.currentScope();
             final String methodName = topLevelScope.getMethodName();
             if ("method3".equals(methodName)) {
                 final Throwable throwable = trigger.getThrowable();
@@ -543,11 +590,14 @@ public class SnaperrTest {
             } else {
                 assertFalse("error propagating from method: " + methodName, false);
             }
+            
+            return "";
         }
 
         @Override
-        public void onTimeout(TimeoutTrigger timeoutTrigger) {
+        public String serializeTrigger(TimeoutTrigger timeoutTrigger) {
             assertFalse("this should not be called in this test case", true);
+            return "";
         }
 
     }

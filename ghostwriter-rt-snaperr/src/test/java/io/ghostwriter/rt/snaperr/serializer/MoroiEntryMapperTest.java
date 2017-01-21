@@ -1,5 +1,6 @@
 package io.ghostwriter.rt.snaperr.serializer;
 
+import io.ghostwriter.rt.snaperr.ErrorTriggerImpl;
 import io.ghostwriter.rt.snaperr.api.ErrorTrigger;
 import io.ghostwriter.rt.snaperr.api.ReferenceTracker;
 import io.ghostwriter.rt.snaperr.tracker.StackBasedReferenceTracker;
@@ -27,7 +28,7 @@ public class MoroiEntryMapperTest {
         referenceTracker.track("var1", 1);
         referenceTracker.track("var2", 2);
 
-        ErrorTrigger errorTrigger = new ErrorTrigger(referenceTracker, throwable);
+        ErrorTrigger errorTrigger = new ErrorTriggerImpl(referenceTracker, throwable);
 
         EntryMapper mapper = new EntryMapper(appUUID);
         Entry moroiEntry = mapper.toMoroiEntry(errorTrigger);

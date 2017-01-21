@@ -3,6 +3,7 @@ package io.ghostwriter.rt.snaperr.serializer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import io.ghostwriter.rt.snaperr.ErrorTriggerImpl;
 import io.ghostwriter.rt.snaperr.api.ErrorTrigger;
 import io.ghostwriter.rt.snaperr.api.ReferenceTracker;
 import io.ghostwriter.rt.snaperr.tracker.StackBasedReferenceTracker;
@@ -37,7 +38,7 @@ public class JsonSerializerTest {
         referenceTracker.track("doPrettyPrint", doPrettyPrint);
         referenceTracker.track("appName", appName);
 
-        ErrorTrigger errorTrigger = new ErrorTrigger(referenceTracker, throwable);
+        ErrorTrigger errorTrigger = new ErrorTriggerImpl(referenceTracker, throwable);
 
         final String json = jsonSerializer.serializeTrigger(errorTrigger);
 
@@ -65,7 +66,7 @@ public class JsonSerializerTest {
         referenceTracker.track("var1", 1);
         referenceTracker.track("var2", 2);
 
-        ErrorTrigger errorTrigger = new ErrorTrigger(referenceTracker, throwable);
+        ErrorTrigger errorTrigger = new ErrorTriggerImpl(referenceTracker, throwable);
 
         final String json = jsonSerializer.serializeTrigger(errorTrigger);
 
