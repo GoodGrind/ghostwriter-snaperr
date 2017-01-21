@@ -8,8 +8,6 @@ import io.ghostwriter.rt.snaperr.api.ReferenceTracker;
 import io.ghostwriter.rt.snaperr.api.SnaperrServiceLoader;
 import io.ghostwriter.rt.snaperr.api.TriggerHandler;
 import io.ghostwriter.rt.snaperr.api.TriggerSerializer;
-import io.ghostwriter.rt.snaperr.handler.Slf4jTriggerHandlerServiceLoader;
-import io.ghostwriter.rt.snaperr.serializer.JsonSerializerServiceLoader;
 import io.ghostwriter.rt.snaperr.tracker.StackBasedReferenceTracker;
 
 public class GhostWriterSnaperrProvider implements TracerProvider<SnaperrTracer> {
@@ -31,8 +29,8 @@ public class GhostWriterSnaperrProvider implements TracerProvider<SnaperrTracer>
 		final ConfigurationReader configReader = new ConfigurationReader();
 
 		@SuppressWarnings("rawtypes")
-		final TriggerSerializer triggerSerializer = loadSnaperrService(TriggerSerializer.class, configReader, null);
-		final TriggerHandler triggerHandler = loadSnaperrService(TriggerHandler.class, configReader, triggerSerializer);
+		final TriggerSerializer triggerSerializer = loadSnaperrService(TriggerSerializer.class, configReader);
+		final TriggerHandler triggerHandler = loadSnaperrService(TriggerHandler.class, configReader);
 
 		final String gwAppName = configReader.getGwAppName();
 		final Properties gwProperties = configReader.getGwProperties(gwAppName);
@@ -48,7 +46,7 @@ public class GhostWriterSnaperrProvider implements TracerProvider<SnaperrTracer>
 		final int throttleMaxErrorsInWindow = Integer.parseInt(strThrottleMaxErrorsInWindow);
 
 		final ReferenceTracker referenceTracker = new StackBasedReferenceTracker();
-		ghostWriterSnaperr = new SnaperrTracer(referenceTracker, triggerHandler, throttleWindowSize,
+		ghostWriterSnaperr = new SnaperrTracer(referenceTracker, triggerSerializer, triggerHandler, throttleWindowSize,
 			throttleMaxErrorsInWindow);
 
 		gwSetupSuccessful = true;
@@ -64,15 +62,12 @@ public class GhostWriterSnaperrProvider implements TracerProvider<SnaperrTracer>
 	}
     }
 
-    @SuppressWarnings("unchecked")
-    private static <T> T loadSnaperrService(final Class<T> clazz, final ConfigurationReader configReader,
-	    @SuppressWarnings("rawtypes") final TriggerSerializer triggerSerializer) {
+    private static <T> T loadSnaperrService(final Class<T> clazz, final ConfigurationReader configReader) {
 	
-	@SuppressWarnings("rawtypes")
 	ServiceLoader<SnaperrServiceLoader> snaperrServiceLoaderList = ServiceLoader.load(SnaperrServiceLoader.class);
 
 	T loadedService = null;
-	for ( SnaperrServiceLoader<T> snaperrServiceLoader : snaperrServiceLoaderList) {
+	for ( SnaperrServiceLoader snaperrServiceLoader : snaperrServiceLoaderList) {
 	    final boolean isServiceSupported = snaperrServiceLoader.isServiceSupported(clazz);
 
 	    if (!isServiceSupported) {
@@ -91,7 +86,7 @@ public class GhostWriterSnaperrProvider implements TracerProvider<SnaperrTracer>
 		LOG.info("Loading implementation of " + clazz.getName() + " by "
 			+ snaperrServiceLoader.getClass().getName() + " service found");
 
-		final T tmpLoadedService = (T) snaperrServiceLoader.load(clazz, configReader, triggerSerializer);
+		final T tmpLoadedService = (T) snaperrServiceLoader.load(clazz, configReader);
 
 		if (tmpLoadedService == null) {
 		    throw new IllegalStateException("Service loader " + snaperrServiceLoader.getClass().getName()
@@ -105,30 +100,22 @@ public class GhostWriterSnaperrProvider implements TracerProvider<SnaperrTracer>
 
 	if (loadedService == null) {
 	    LOG.warn("No implementation of " + clazz.getName() + " found, loading default implementation");
-	    loadedService = loadDefaultSnaperrService(clazz, configReader, triggerSerializer);
+	    loadedService = loadDefaultSnaperrService(clazz, configReader);
 	}
 
 	return loadedService;
     }
 
-    @SuppressWarnings("unchecked")
-    private static <T> T loadDefaultSnaperrService(final Class<T> clazz, final ConfigurationReader configReader,
-	    @SuppressWarnings("rawtypes") final TriggerSerializer triggerSerializer) {
-
-	SnaperrServiceLoader<T> snaperrServiceLoader = null;
-	if (TriggerHandler.class.equals(clazz)) {
-	    snaperrServiceLoader = (SnaperrServiceLoader<T>) new Slf4jTriggerHandlerServiceLoader();
-	}
-	else if (TriggerSerializer.class.equals(clazz)) {
-	    snaperrServiceLoader = (SnaperrServiceLoader<T>) new JsonSerializerServiceLoader();
+    private static <T> T loadDefaultSnaperrService(final Class<T> clazz, final ConfigurationReader configReader) {
+	DefaultSnaperrServiceLoader defaultServiceLoader = new DefaultSnaperrServiceLoader();
+	
+	if (defaultServiceLoader.isServiceSupported(clazz)) {
+	    return defaultServiceLoader.load(clazz, configReader);
 	}
 	else {
 	    throw new RuntimeException("Service " + clazz.getName() + " is not recognized by Snaperr. Use "
 		    + TriggerHandler.class.getName() + " or " + TriggerSerializer.class.getName());
 	}
-
-	T loadedService = snaperrServiceLoader.load(clazz, configReader, triggerSerializer);
-	return loadedService;
     }
 
 }

@@ -7,27 +7,26 @@ import io.ghostwriter.rt.snaperr.ConfigurationReader;
  *
  * @param <T>
  */
-public interface SnaperrServiceLoader<T> {
+public interface SnaperrServiceLoader {
     
     /**
      * Tells whether the argument service is supported by the loader.<br/>
-     * If returns <i>true</i>, then {@link #load(Class, ConfigurationReader, TriggerSerializer)} must return an instance
+     * If returns <i>true</i>, then {@link #load(Class, ConfigurationReader)} must return an instance
      * 
      * @param clazz
      * @return true if supported, false otherwize
      */
-    public boolean isServiceSupported(Class<T> clazz);
+    public boolean isServiceSupported(Class<?> clazz);
 
     /**
      * Load a Snaperr service. 
      * 
-     * @param clazz service to be loaded
+     * @param clazz type of the service to be loaded
      * @param configReader to be able to read configuration values
-     * @param triggerSerializer Only necessary when the provided service depends on the serializer
      * @return service instance if {@link #isServiceSupported(Class)} returns <i>true</i>
      * otherwise this method must return <i>NULL</i>
      */
-    public T load(Class<T> clazz, ConfigurationReader configReader, TriggerSerializer triggerSerializer);
+    public <T> T load(Class<T> clazz, ConfigurationReader configReader);
     
     /*
      * Sorry, TriggerHandler depends on TriggerSerializer because sometimes we just want to log out
