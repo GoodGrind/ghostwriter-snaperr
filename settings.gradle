@@ -1,3 +1,4 @@
 include 'ghostwriter-rt-snaperr'
 include 'ghostwriter-rt-snaperr-moroi'
+include 'ghostwriter-rt-snaperr-slf4j'
 rootProject.name = 'ghostwriter'

@@ -1,4 +1,4 @@
-package io.ghostwriter.rt.snaperr.handler;
+package io.ghostwriter.rt.snaperr.moroi.handler;
 
 import java.util.Properties;
 
