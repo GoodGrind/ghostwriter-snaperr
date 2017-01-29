@@ -2,7 +2,6 @@ package io.ghostwriter.rt.snaperr.json.serializer;
 
 import com.google.gson.annotations.SerializedName;
 
-import io.ghostwriter.rt.snaperr.serializer.Variable;
 
 import java.util.LinkedList;
 import java.util.List;

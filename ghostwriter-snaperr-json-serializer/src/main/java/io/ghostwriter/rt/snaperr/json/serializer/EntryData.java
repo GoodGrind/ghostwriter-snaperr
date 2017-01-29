@@ -1,6 +1,5 @@
 package io.ghostwriter.rt.snaperr.json.serializer;
 
-import io.ghostwriter.rt.snaperr.serializer.Attributes;
 
 public class EntryData {
 

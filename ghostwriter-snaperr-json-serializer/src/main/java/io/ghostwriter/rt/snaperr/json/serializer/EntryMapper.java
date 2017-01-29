@@ -11,12 +11,6 @@ import java.util.Objects;
 
 import io.ghostwriter.rt.snaperr.api.ErrorTrigger;
 import io.ghostwriter.rt.snaperr.api.TrackedScope;
-import io.ghostwriter.rt.snaperr.serializer.Attributes;
-import io.ghostwriter.rt.snaperr.serializer.Context;
-import io.ghostwriter.rt.snaperr.serializer.ContextData;
-import io.ghostwriter.rt.snaperr.serializer.Entry;
-import io.ghostwriter.rt.snaperr.serializer.EntryData;
-import io.ghostwriter.rt.snaperr.serializer.Variable;
 import io.ghostwriter.rt.snaperr.tracker.TrackedValue;
 
 public class EntryMapper {

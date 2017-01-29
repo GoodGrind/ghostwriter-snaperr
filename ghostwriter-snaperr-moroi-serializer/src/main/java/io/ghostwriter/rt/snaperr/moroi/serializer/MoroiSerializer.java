@@ -8,7 +8,6 @@ import com.google.gson.JsonObject;
 import io.ghostwriter.rt.snaperr.api.ErrorTrigger;
 import io.ghostwriter.rt.snaperr.api.TimeoutTrigger;
 import io.ghostwriter.rt.snaperr.api.TriggerSerializer;
-import io.ghostwriter.rt.snaperr.serializer.ClassSerializer;
 
 import java.util.Objects;
 
