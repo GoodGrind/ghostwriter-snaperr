@@ -6,6 +6,11 @@ import org.junit.Test;
 import java.net.URL;
 import java.util.Properties;
 
+/**
+ * Testing {@link ConfigurationReader}
+ * @author pal
+ *
+ */
 public class GhostWriterConfigurationReaderTest {
 
     private static final String GW_TEST_APP = "gwTestApp";

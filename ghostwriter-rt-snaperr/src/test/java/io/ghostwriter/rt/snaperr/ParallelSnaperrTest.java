@@ -18,6 +18,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Testing concurrency of Snaperr
+ * @author pal
+ *
+ */
 public class ParallelSnaperrTest {
 
     @Test
@@ -83,6 +88,12 @@ public class ParallelSnaperrTest {
 
     }
     
+    /**
+     * This class captures calls to the serializeTrigger method for two different threads and two different values.
+     * It asserts that the StackBasedReferenceTracker isolates Scopes per threads.
+     * @author pal
+     *
+     */
     static private class ParallelTriggerSerializer implements TriggerSerializer<String> {
 
         private AtomicBoolean thread1ErrorProcessed = new AtomicBoolean(false);
@@ -92,23 +103,22 @@ public class ParallelSnaperrTest {
 	@Override
 	public String serializeTrigger(ErrorTrigger errorTrigger) {
             final TrackedScope topLevelScope = errorTrigger.currentScope();
+            Map<String, TrackedValue> watched = topLevelScope.getReferences();
+            
+            assertTrue("Expected number of watched variables: 1, got: " + watched.size(), watched.size() == 1);
+            
             if ("thread1".equals(topLevelScope.getMethodName())) {
-                Map<String, TrackedValue> watched = topLevelScope.getReferences();
-
-                assertTrue("Expected number of watched variables: 1, got: " + watched.size(), watched.size() == 1);
 
                 TrackedValueAsserter.assertTrackedValue(watched, "someValue", 11);
                 thread1ErrorProcessed.compareAndSet(false, true);
+                TrackedValueAsserter.assertTrackeValueNotCaptured(watched, "differentValue", 22);
             }
 
             if ("thread2".equals(topLevelScope.getMethodName())) {
-                Map<String, TrackedValue> watched = topLevelScope.getReferences();
-
-                assertTrue("Expected number of watched variables: 1, got: " + watched.size(), watched.size() == 1);
 
                 TrackedValueAsserter.assertTrackedValue(watched, "differentValue", 22);
-
                 thread2ErrorProcessed.compareAndSet(false, true);
+                TrackedValueAsserter.assertTrackeValueNotCaptured(watched, "someValue", 11);
             }
             
             return "";

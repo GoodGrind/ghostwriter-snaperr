@@ -1,5 +1,11 @@
 package io.ghostwriter.rt.snaperr;
 
+/**
+ * A test value class that is mutable
+ * 
+ * @author pal
+ *
+ */
 class MutableValueClass {
 
     private String stringValue;

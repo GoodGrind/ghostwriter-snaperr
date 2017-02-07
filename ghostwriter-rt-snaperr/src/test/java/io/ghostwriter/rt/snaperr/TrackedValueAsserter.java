@@ -5,6 +5,7 @@ import io.ghostwriter.rt.snaperr.tracker.TrackedValue;
 import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 public class TrackedValueAsserter {
 
@@ -29,6 +30,12 @@ public class TrackedValueAsserter {
         // Verify value correctness
         assertTrue("Expected value of '" + variableName + "' is '" + expectedVariableValue + "', got: " + valueOfVariable,
                 valueOfVariable.equals(expectedVariableValue));
+    }
+    
+    public static <T> void assertTrackeValueNotCaptured(Map<String, TrackedValue> watched, String variableName, T expectedVariableValue) {
+        // Verify that the variable is not present among the watched ones
+        assertFalse("Variable '" + variableName + "' is watched!", watched.containsKey(variableName));
+
     }
 
 }
