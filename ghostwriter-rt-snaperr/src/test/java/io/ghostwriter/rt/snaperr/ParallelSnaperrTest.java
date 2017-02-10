@@ -31,7 +31,7 @@ public class ParallelSnaperrTest {
         ReferenceTracker referenceTracker = new StackBasedReferenceTracker();
 	
         TriggerHandler<?> noopTriggerHandler = new NoopTriggerHandler();
-	final SnaperrTracer gwErrMon = new SnaperrTracer(referenceTracker, parallelTriggerSerializer, noopTriggerHandler, -1L, -1);
+	final SnaperrTracer gwErrMon = new SnaperrTracer(referenceTracker, parallelTriggerSerializer, noopTriggerHandler, new AllowAllThrottleControl());
 
         // We need to make sure that  2 threads are executed at the "same time".
         // This way we can assure the timing from the main thread. Hence the 3 threads instead of 2.

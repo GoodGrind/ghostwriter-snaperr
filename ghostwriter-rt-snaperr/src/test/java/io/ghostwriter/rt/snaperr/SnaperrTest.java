@@ -74,7 +74,7 @@ public class SnaperrTest {
 
         };
         
-        SnaperrTracer gwErrMon = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), -1L, -1);
+        SnaperrTracer gwErrMon = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), new AllowAllThrottleControl());
 
         gwErrMon.entering(this, METHOD_NAME);
         int x = 42;
@@ -112,7 +112,7 @@ public class SnaperrTest {
             }
         };
         
-        SnaperrTracer gwErrMon = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), -1L, -1);
+        SnaperrTracer gwErrMon = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), new AllowAllThrottleControl());
 
         gwErrMon.entering("this", METHOD_NAME);
         gwErrMon.valueChange(this, METHOD_NAME, "y", 1);
@@ -153,7 +153,7 @@ public class SnaperrTest {
             }
         };
         
-        SnaperrTracer gwErrMon = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), -1L, -1);
+        SnaperrTracer gwErrMon = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), new AllowAllThrottleControl());
         
         gwErrMon.entering(this, METHOD_NAME);
         gwErrMon.valueChange(this, METHOD_NAME, "mvc", mvc);
@@ -189,7 +189,7 @@ public class SnaperrTest {
         };
         
 
-        SnaperrTracer gwErrMon = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), -1L, -1);
+        SnaperrTracer gwErrMon = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), new AllowAllThrottleControl());
 
         MutableValueClass mvc = new MutableValueClass("first", 1);
         gwErrMon.entering(this, METHOD_NAME);
@@ -226,7 +226,7 @@ public class SnaperrTest {
             }
         };
 
-        SnaperrTracer gwSnaperr = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), -1L, -1);
+        SnaperrTracer gwSnaperr = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), new AllowAllThrottleControl());
 
         gwSnaperr.entering(this, "methodX");
         gwSnaperr.valueChange(this, "methodX", "a", 1);
@@ -281,7 +281,7 @@ public class SnaperrTest {
             }
         };
         
-        SnaperrTracer gwSnaperr = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), -1L, -1);
+        SnaperrTracer gwSnaperr = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), new AllowAllThrottleControl());
 
         gwSnaperr.entering(this, "method1");
         gwSnaperr.valueChange(this, "method1", "x", 1);
@@ -321,7 +321,7 @@ public class SnaperrTest {
     @Test
     public void testExceptionRethrow() {
         final ExceptionRethrowSerializer exceptionRethrowSerializer = new ExceptionRethrowSerializer();
-        SnaperrTracer gwSnaperr = new SnaperrTracer(new StackBasedReferenceTracker(), exceptionRethrowSerializer, new NoopTriggerHandler(), -1L, -1);
+        SnaperrTracer gwSnaperr = new SnaperrTracer(new StackBasedReferenceTracker(), exceptionRethrowSerializer, new NoopTriggerHandler(), new AllowAllThrottleControl());
 
         gwSnaperr.entering(this, "method1");
         gwSnaperr.valueChange(this, "method1", "x", 1);
@@ -382,7 +382,7 @@ public class SnaperrTest {
             }
         };
         
-        SnaperrTracer gwSnapper = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), -1L, -1);
+        SnaperrTracer gwSnapper = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), new AllowAllThrottleControl());
 
         gwSnapper.entering(this, "method1");
         gwSnapper.valueChange(this, "method1", "x", 12);
@@ -438,7 +438,7 @@ public class SnaperrTest {
             }
         };
         // the 2 step trigger setting is required because otherwise we could not reference the gwSnapper in the handler itself
-        SnaperrTracer gwSnapper = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), -1L, -1);
+        SnaperrTracer gwSnapper = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), new AllowAllThrottleControl());
         delegatingGwSnapper.setOtherTracer(gwSnapper);
 
         gwSnapper.entering(this, "tenPerZero");
@@ -491,7 +491,7 @@ public class SnaperrTest {
             }
         };
         
-        SnaperrTracer gwSnapper = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), -1L, -1);
+        SnaperrTracer gwSnapper = new SnaperrTracer(new StackBasedReferenceTracker(), triggerSerializer, new NoopTriggerHandler(), new AllowAllThrottleControl());
         delegatingGwSnapper.setOtherTracer(gwSnapper);
         
         // the 2 step trigger setting is required because otherwise we could not reference the gwSnapper in the handler itself
@@ -574,7 +574,7 @@ public class SnaperrTest {
 
         ReferenceTracker referenceTracker = new StackBasedReferenceTracker();
         TriggerHandler<String> noopTriggerHandler = new NoopTriggerHandler();
-	SnaperrTracer gwSnaperr = new SnaperrTracer(referenceTracker, triggerSerializer, noopTriggerHandler, -1L, -1); 
+	SnaperrTracer gwSnaperr = new SnaperrTracer(referenceTracker, triggerSerializer, noopTriggerHandler, new AllowAllThrottleControl()); 
 
         gwSnaperr.entering(this, "method1");
         gwSnaperr.valueChange(this, "method1", "a", 1);
@@ -631,7 +631,7 @@ public class SnaperrTest {
 	    
 	};
 	
-	SnaperrTracer gwSnaperr = new SnaperrTracer(referenceTracker, triggerSerializer, triggerHandler, -1L, -1);
+	SnaperrTracer gwSnaperr = new SnaperrTracer(referenceTracker, triggerSerializer, triggerHandler, new AllowAllThrottleControl());
 	gwSnaperr.entering(this, "testTriggerHandlerCalled");
 	gwSnaperr.onError(this, "testTriggerHandlerCalled", new NullPointerException());
 	assertTrue("One of TriggerSerializer#serializeTrigger(ErrorTrigger) or TriggerHandler#onError() was not called", methodCallCount[0] == 2);
@@ -679,7 +679,7 @@ public class SnaperrTest {
 	    
 	};
 	
-	SnaperrTracer gwSnaperr = new SnaperrTracer(referenceTracker, triggerSerializer, triggerHandler, -1L, -1);
+	SnaperrTracer gwSnaperr = new SnaperrTracer(referenceTracker, triggerSerializer, triggerHandler, new AllowAllThrottleControl());
 	gwSnaperr.entering(this, "testTriggerHandlerCalled2");
 	gwSnaperr.onError(this, "testTriggerHandlerCalled2", new NullPointerException());
 	assertTrue("One of TriggerSerializer#serializeTrigger(TimeoutTrigger) or TriggerHandler#onTimeout() was not called", methodCallCount[0] == 2);

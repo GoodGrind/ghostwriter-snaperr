@@ -5,6 +5,7 @@ import java.util.Objects;
 import io.ghostwriter.Tracer;
 import io.ghostwriter.rt.snaperr.api.ErrorTrigger;
 import io.ghostwriter.rt.snaperr.api.ReferenceTracker;
+import io.ghostwriter.rt.snaperr.api.ThrottleControlStrategy;
 import io.ghostwriter.rt.snaperr.api.TimeoutTrigger;
 import io.ghostwriter.rt.snaperr.api.TriggerHandler;
 import io.ghostwriter.rt.snaperr.api.TriggerSerializer;
@@ -30,27 +31,18 @@ public class SnaperrTracer implements Tracer {
 	    return new ErrorState();
 	}
     };
-
-    /**
-     * For throttling, amount of time where maximum {@link #maxErrorsInWindow}
-     * errors are allowed. < 0 means no throttling
-     */
-    private final long errorWindowSize;
-    /**
-     * For throttling, amount of errors allowed in each throttling window. < 0
-     * means no throttling
-     */
-    private final int maxErrorsInWindow;
+    
+    private final ThrottleControlStrategy throttleControl;
 
 
     public SnaperrTracer(ReferenceTracker referenceTracker, TriggerSerializer<?> triggerSerializer,
-	    TriggerHandler<?> triggerHandler, long errorWindowSize, int maxErrorsInWindow) {
+	    TriggerHandler<?> triggerHandler, ThrottleControlStrategy throttleControl) {
 	this.referenceTracker = Objects.requireNonNull(referenceTracker);
 	this.triggerHandler = triggerHandler;
-	this.errorWindowSize = errorWindowSize;
-	this.maxErrorsInWindow = maxErrorsInWindow;
+	this.throttleControl = throttleControl;
 	this.triggerSerializer = triggerSerializer;
     }
+
 
     @Override
     public void entering(Object source, String method, Object... params) {
@@ -96,7 +88,7 @@ public class SnaperrTracer implements Tracer {
     @SuppressWarnings("unchecked")
     @Override
     public void onError(Object source, String method, Throwable error) {
-	if (hasPendingProcessing() || isPropagatingException(error) || throttleControl()) {
+	if (hasPendingProcessing() || isPropagatingException(error)) {
 	    return;
 	}
 
@@ -119,6 +111,12 @@ public class SnaperrTracer implements Tracer {
 	 */
 
 	ErrorTrigger trigger = new ErrorTriggerImpl(referenceTracker, error);
+	
+	synchronized (throttleControl) {
+	    if (! throttleControl.isHandleError(trigger)) {
+		return;
+	    }	    
+	}
 
 	startTriggerProcessing(trigger);
 	Object serializedError = triggerSerializer.serializeTrigger(trigger);
@@ -148,6 +146,13 @@ public class SnaperrTracer implements Tracer {
 	// then we might end up raising timeouts at all steps...
 
 	TimeoutTrigger trigger = new TimeoutTriggerImpl(referenceTracker, timeoutThreshold, timeout);
+	
+	synchronized (throttleControl) {
+	    if (!throttleControl.isHandleTimeout(trigger)) {
+		return;
+	    }
+	}
+	
 	startTriggerProcessing(null);
 	Object serializedTimeout = triggerSerializer.serializeTrigger(trigger);
 	triggerHandler.onTimeout(serializedTimeout);
@@ -156,50 +161,6 @@ public class SnaperrTracer implements Tracer {
 
     private ErrorTrigger getProcessedErrorTrigger() {
 	return errorTrackerThreadLocal.get().getProcessedErrorTrigger();
-    }
-
-    /**
-     * Only {@link ErrorState#getMaxErrorCountInBucket()} number of errors are
-     * handled within a {@link ErrorState#getPurgeBucketMs()} window.
-     * <p>
-     * <p>
-     * if the maxErrorCountInBucket number of errors have been reached, then
-     * there are no new errors handled until the bucket is emptied.
-     *
-     * @return
-     *         <li>true - throttling, must not handle error
-     *         <li>false - no throttling, error the handle now
-     */
-    private boolean throttleControl() {
-	if (isThrottlingDisabled()) {
-	    return false;
-	}
-
-	final long errorWindowSizeMs = getErrorWindowSizeMs();
-	final int maxErrorCountInWindow = getMaxErrorCountInWindow();
-	ErrorState errorState = errorTrackerThreadLocal.get();
-
-	final long nowMs = System.currentTimeMillis();
-	final long elapsedSinceLastPurgeMs = nowMs - errorState.getBucketPurgedLastTimeMs();
-
-	if (elapsedSinceLastPurgeMs >= errorWindowSizeMs) {
-	    // Empty the bucket
-	    errorState.setErrorsInBucket(0);
-	    errorState.setBucketPurgedLastTimeMs(nowMs);
-	}
-
-	int errorsInBucket = errorState.getErrorsInBucket();
-	errorsInBucket++;
-	errorState.setErrorsInBucket(errorsInBucket);
-
-	return errorsInBucket > maxErrorCountInWindow;
-    }
-
-    private boolean isThrottlingDisabled() {
-	final long errorWindowSizeMs = getErrorWindowSizeMs();
-	final int maxErrorCountInWindow = getMaxErrorCountInWindow();
-
-	return errorWindowSizeMs < 1L || maxErrorCountInWindow < 1;
     }
 
     private void startTriggerProcessing(ErrorTrigger errorTrigger) {
@@ -214,14 +175,6 @@ public class SnaperrTracer implements Tracer {
 
     private boolean hasPendingProcessing() {
 	return errorTrackerThreadLocal.get().isProcessingInProgress();
-    }
-
-    private long getErrorWindowSizeMs() {
-	return errorWindowSize;
-    }
-
-    private int getMaxErrorCountInWindow() {
-	return maxErrorsInWindow;
     }
 
     /**
@@ -241,9 +194,6 @@ public class SnaperrTracer implements Tracer {
 	 */
 	private boolean processingInProgress = false;
 
-	private int errorsInBucket = 0;
-	private long bucketPurgedLastTimeMs = System.currentTimeMillis();
-
 	ErrorTrigger getProcessedErrorTrigger() {
 	    return processedErrorTrigger;
 	}
@@ -258,22 +208,6 @@ public class SnaperrTracer implements Tracer {
 
 	void setProcessingInProgress(boolean processingInProgress) {
 	    this.processingInProgress = processingInProgress;
-	}
-
-	int getErrorsInBucket() {
-	    return errorsInBucket;
-	}
-
-	void setErrorsInBucket(int errorsInBucket) {
-	    this.errorsInBucket = errorsInBucket;
-	}
-
-	long getBucketPurgedLastTimeMs() {
-	    return bucketPurgedLastTimeMs;
-	}
-
-	void setBucketPurgedLastTimeMs(long bucketPurgedLastTimeMs) {
-	    this.bucketPurgedLastTimeMs = bucketPurgedLastTimeMs;
 	}
 
     }

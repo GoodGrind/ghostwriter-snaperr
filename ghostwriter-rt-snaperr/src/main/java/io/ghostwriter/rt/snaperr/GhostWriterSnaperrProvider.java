@@ -6,6 +6,7 @@ import java.util.ServiceLoader;
 import io.ghostwriter.TracerProvider;
 import io.ghostwriter.rt.snaperr.api.ReferenceTracker;
 import io.ghostwriter.rt.snaperr.api.SnaperrServiceLoader;
+import io.ghostwriter.rt.snaperr.api.ThrottleControlStrategy;
 import io.ghostwriter.rt.snaperr.api.TriggerHandler;
 import io.ghostwriter.rt.snaperr.api.TriggerSerializer;
 import io.ghostwriter.rt.snaperr.tracker.StackBasedReferenceTracker;
@@ -31,23 +32,10 @@ public class GhostWriterSnaperrProvider implements TracerProvider<SnaperrTracer>
 		@SuppressWarnings("rawtypes")
 		final TriggerSerializer triggerSerializer = loadSnaperrService(TriggerSerializer.class, configReader);
 		final TriggerHandler triggerHandler = loadSnaperrService(TriggerHandler.class, configReader);
-
-		final String gwAppName = configReader.getGwAppName();
-		final Properties gwProperties = configReader.getGwProperties(gwAppName);
-
-		final String strThrottleWindowSize = gwProperties.getProperty(
-			ConfigurationReader.CFG_THROTTLE_WINDOW_SIZE,
-			String.valueOf(SnaperrTracer.DEFAULT_ERROR_WINDOW_SIZE_MS));
-		final long throttleWindowSize = Long.parseLong(strThrottleWindowSize);
-
-		final String strThrottleMaxErrorsInWindow = gwProperties.getProperty(
-			ConfigurationReader.CFG_THROTTLE_MAX_ERRORS,
-			String.valueOf(SnaperrTracer.DEFAULT_MAX_ERROR_COUNT_IN_WINDOW));
-		final int throttleMaxErrorsInWindow = Integer.parseInt(strThrottleMaxErrorsInWindow);
+		final ThrottleControlStrategy throttleControl = loadSnaperrService(ThrottleControlStrategy.class, configReader);
 
 		final ReferenceTracker referenceTracker = new StackBasedReferenceTracker();
-		ghostWriterSnaperr = new SnaperrTracer(referenceTracker, triggerSerializer, triggerHandler, throttleWindowSize,
-			throttleMaxErrorsInWindow);
+		ghostWriterSnaperr = new SnaperrTracer(referenceTracker, triggerSerializer, triggerHandler, throttleControl);
 
 		gwSetupSuccessful = true;
 
