@@ -681,7 +681,7 @@ public class SnaperrTest {
 	
 	SnaperrTracer gwSnaperr = new SnaperrTracer(referenceTracker, triggerSerializer, triggerHandler, new AllowAllThrottleControl());
 	gwSnaperr.entering(this, "testTriggerHandlerCalled2");
-	gwSnaperr.onError(this, "testTriggerHandlerCalled2", new NullPointerException());
+	gwSnaperr.timeout(this, "testTriggerHandlerCalled2", 10, 11);
 	assertTrue("One of TriggerSerializer#serializeTrigger(TimeoutTrigger) or TriggerHandler#onTimeout() was not called", methodCallCount[0] == 2);
     }
 
