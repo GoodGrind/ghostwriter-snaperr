@@ -14,11 +14,14 @@ import org.junit.Test;
 import java.util.Iterator;
 import java.util.Map;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class SnaperrTest {
 
+    /**
+     * Test that {@link TriggerSerializer#serializeTrigger(ErrorTrigger)} gets called
+     * with the correct values
+     */
     @Test
     public void testTriggerCreation() {
         final String METHOD_NAME = "testTriggerCreation";
@@ -83,6 +86,9 @@ public class SnaperrTest {
         gwErrMon.timeout(this, METHOD_NAME, 1000L, 2000L);
     }
 
+    /**
+     * Test tracking of primitive variables i.e. int (not Integer)
+     */
     @Test
     public void testTrackedPrimitiveValueUpdate() {
         final String METHOD_NAME = "testTrackedPrimitiveValueUpdate";
@@ -114,6 +120,11 @@ public class SnaperrTest {
         gwErrMon.onError(this, METHOD_NAME, new IllegalArgumentException());
     }
 
+    /**
+     * Test that once a mutable object is captured by {@link SnaperrTracer#valueChange(Object, String, String, Object)},
+     * a change in the new state of the mutable object will be present at the
+     * {@link TriggerSerializer#serializeTrigger(ErrorTrigger)}
+     */
     @Test
     public void testTrackedMutableObjectStateChange() {
         final String METHOD_NAME = "testTrackedMutableObjectStateChange";
@@ -150,6 +161,10 @@ public class SnaperrTest {
         gwErrMon.onError(this, METHOD_NAME, new IllegalArgumentException());
     }
 
+    /**
+     * Test that multiple {@link SnaperrTracer#valueChange(Object, String, String, Object)}
+     * on the same object will result in only one tracker variable on the scope
+     */
     @Test
     public void testTrackedReferenceChange() {
         final String METHOD_NAME = "testTrackedReferenceChange";
@@ -184,6 +199,11 @@ public class SnaperrTest {
         gwErrMon.onError(this, METHOD_NAME, new IllegalArgumentException());
     }
 
+    /**
+     * Test that a new scope is created on every {@link SnaperrTracer#entering(Object, String, Object...)}
+     * call, and {@link SnaperrTracer#onError(Object, String, Throwable)} only the current scope is
+     * the last scope
+     */
     @Test
     public void testTrackedScope() {
 	TriggerSerializer<String> triggerSerializer = new TriggerSerializer<String>() {
@@ -215,27 +235,29 @@ public class SnaperrTest {
         gwSnaperr.onError(this, "methodY", new IllegalArgumentException());
     }
 
+    /**
+     * Simulation of a scenario where an unexpected error is only handled at the top of the call stack:
+     * <pre>
+     *
+     *      method1() {
+     *          try {
+     *              x = 1
+     *              method2() {
+     *                  y = 2
+     *                  method3() {
+     *                      z = 3
+     *                      throw new NullPointerException()
+     *                  }
+     *              }
+     *          }
+     *          catch (Exception e) {
+     *              ...
+     *          }
+     *      }
+     * </pre>
+     */
     @Test
     public void testExceptionPropagationDetection() {
-        /*
-            Simulation of a scenario where an unexpected error is only handled at the top of the call stack:
-
-            method1() {
-                try {
-                    x = 1
-                    method2() {
-                        y = 2
-                        method3() {
-                            z = 3
-                            throw new NullPointerException()
-                        }
-                    }
-                }
-                catch (Exception e) {
-                    ...
-                }
-            }
-         */
 
         TriggerSerializer<String> triggerSerializer = new TriggerSerializer<String>() {
             @Override
@@ -275,28 +297,29 @@ public class SnaperrTest {
         gwSnaperr.exiting(this, "method1");
     }
 
+    /**
+     * 
+     * During propagation a different type of exception is (re)thrown, so Snaperr should detect it
+     * <pre>
+     * method1() {
+     *     x = 1
+     *     method2() {
+     *         try {
+     *             y = 2
+     *             method3() {
+     *                 z = 3
+     *                 throw new NullPointerException()
+     *             }
+     *         }
+     *         catch (Exception e) {
+     *             throw new IllegalArgumentException(e)
+     *         }
+     *     }
+     * }
+     * </pre>
+     */
     @Test
     public void testExceptionRethrow() {
-        /*
-            During propagation a different type of exception is (re)thrown, so Snaperr should detect it
-
-            method1() {
-                x = 1
-                method2() {
-                    try {
-                        y = 2
-                        method3() {
-                            z = 3
-                            throw new NullPointerException()
-                        }
-                    }
-                    catch (Exception e) {
-                        throw new IllegalArgumentException(e)
-                    }
-                }
-            }
-         */
-
         final ExceptionRethrowSerializer exceptionRethrowSerializer = new ExceptionRethrowSerializer();
         SnaperrTracer gwSnaperr = new SnaperrTracer(new StackBasedReferenceTracker(), exceptionRethrowSerializer, new NoopTriggerHandler(), -1L, -1);
 
@@ -319,23 +342,23 @@ public class SnaperrTest {
         	exceptionRethrowSerializer.getNumberOfErrorEvents() == 2);
     }
 
+    /**
+     * Simulation of a scenario where we enter and successfully exit from a method and before encountering an error
+     * in the caller method
+     * <pre>
+     * method1() {
+     *     x = 12
+     *     y = 114
+     *     method2(x,y) {
+     *     }
+     *     z = 212
+     *     throw IllegalStateException
+     * }
+     * 
+     * </pre>
+     */
     @Test
     public void testScopePersistence() {
-
-        /*
-            Simulation of a scenario where we enter and successfully exit from a method and before encountering an error
-            in the caller method
-
-            method1() {
-                x = 12
-                y = 114
-                method2(x,y) {
-                }
-                z = 212
-                throw IllegalStateException
-            }
-
-         */
 
         TriggerSerializer<String> triggerSerializer = new TriggerSerializer<String>() {
 
@@ -370,10 +393,12 @@ public class SnaperrTest {
         gwSnapper.onError(this, "method1", new IllegalStateException("the state is bad!"));
     }
 
+    /**
+     * It can happen that we call a GW instrumented function during Trigger processing, for example toString method of a POJO.
+     * The implementation should be robust and handle this as well.
+     */
     @Test
     public void testProcessingTracedValues() {
-        // It can happen that we call a GW instrumented function during Trigger processing, for example toString method of a POJO.
-        // The implementation should be robust and handle this as well.
 
 	final DelegatingGwTracer delegatingGwSnapper = new DelegatingGwTracer();
         final TriggerSerializer<String> triggerSerializer = new TriggerSerializer<String>() {
@@ -422,10 +447,12 @@ public class SnaperrTest {
         gwSnapper.onError(this, "tenPerZero", new ArithmeticException("legendary zero division"));
     }
 
+    /**
+     * It can happen that we call a GW instrumented function during Trigger        
+     * processing that also triggers an error, for example circular serialization  
+     */
     @Test
     public void testErrorEventDuringTriggerProcessing() {
-        // It can happen that we call a GW instrumented function during Trigger 
-	// processing that also triggers an error, for example circular serialization
 
         final DelegatingGwTracer delegatingGwSnapper = new DelegatingGwTracer();
         final TriggerSerializer<String> triggerSerializer = new TriggerSerializer<String>() {
@@ -475,25 +502,26 @@ public class SnaperrTest {
         gwSnapper.onError(this, "method1", new IllegalArgumentException("It's dead Jim."));
     }
 
+    /**
+     * In case of nested method calls, when an error occurs we should be able to access watched values from callers 
+     * <pre>                                                                                                        
+     * method1() {                                                                                                  
+     *     a = 1                                                                                                    
+     *     b = 2                                                                                                    
+     *     method2() {                                                                                              
+     *         c = 3                                                                                                
+     *         d = 4                                                                                                
+     *         method3() {                                                                                          
+     *             e = 5                                                                                            
+     *             f = 6                                                                                            
+     *             throw new NullPointerException()                                                                 
+     *         }                                                                                                    
+     *     }                                                                                                        
+     * }
+     * </pre>                                                                                                            
+     */
     @Test
     public void testWatchedStackUnwinding() {
-        /*
-            In case of nested method calls, when an error occurs we should be able to access watched values from callers
-
-            method1() {
-                a = 1
-                b = 2
-                method2() {
-                    c = 3
-                    d = 4
-                    method3() {
-                        e = 5
-                        f = 6
-                        throw new NullPointerException()
-                    }
-                }
-            }
-         */
 
         	
         TriggerSerializer<String> triggerSerializer = new TriggerSerializer<String>() {
@@ -559,6 +587,102 @@ public class SnaperrTest {
         gwSnaperr.valueChange(this, "method3", "f", 6);
         gwSnaperr.valueChange(this, "method3", "g", 7);
         gwSnaperr.onError(this, "method3", new NullPointerException());
+    }
+    
+    /**
+     * Test that both {@link TriggerHandler#onError(Object)} and {@link TriggerSerializer#serializeTrigger(ErrorTrigger)}
+     * is called on error
+     */
+    @Test
+    public void testTriggerHandlerCalled() {
+
+	final int[] methodCallCount = {0};
+	final String SERIALIZED_ERROR = "serialized error string";
+	
+        ReferenceTracker referenceTracker = new StackBasedReferenceTracker();
+        TriggerHandler<String> triggerHandler = new TriggerHandler<String>() {
+
+	    @Override
+	    public void onError(String serializedError) {
+		assertEquals("Serialized error message on trigger handler is not the same as returned from triggerserializer", SERIALIZED_ERROR, serializedError);
+		methodCallCount[0]++;
+	    }
+
+	    @Override
+	    public void onTimeout(String serializedTimeout) {
+                assertFalse("this should not be called in this test case", true);
+	    }
+            
+	};
+	
+	TriggerSerializer<String> triggerSerializer = new TriggerSerializer<String>() {
+
+	    @Override
+	    public String serializeTrigger(ErrorTrigger errorTrigger) {
+		methodCallCount[0]++;
+		return SERIALIZED_ERROR;
+	    }
+
+	    @Override
+	    public String serializeTrigger(TimeoutTrigger timeoutTrigger) {
+                assertFalse("this should not be called in this test case", true);
+                return "";
+	    }
+	    
+	};
+	
+	SnaperrTracer gwSnaperr = new SnaperrTracer(referenceTracker, triggerSerializer, triggerHandler, -1L, -1);
+	gwSnaperr.entering(this, "testTriggerHandlerCalled");
+	gwSnaperr.onError(this, "testTriggerHandlerCalled", new NullPointerException());
+	assertTrue("One of TriggerSerializer#serializeTrigger(ErrorTrigger) or TriggerHandler#onError() was not called", methodCallCount[0] == 2);
+    }
+    
+    /**
+     * Test that both {@link TriggerHandler#onTimeout(Object)} and {@link TriggerSerializer#serializeTrigger(TimeoutTrigger)}
+     * is called on timeout
+     */
+    @Test
+    public void testTriggerHandlerCalled2() {
+
+	final int[] methodCallCount = {0};
+	final String SERIALIZED_TIMEOUT = "serialized error string";
+	
+        ReferenceTracker referenceTracker = new StackBasedReferenceTracker();
+        TriggerHandler<String> triggerHandler = new TriggerHandler<String>() {
+
+	    @Override
+	    public void onError(String serializedError) {
+                assertFalse("this should not be called in this test case", true);
+	    }
+
+	    @Override
+	    public void onTimeout(String serializedTimeout) {
+		assertEquals("Serialized error message on trigger handler is not the same as returned from triggerserializer", SERIALIZED_TIMEOUT, serializedTimeout);
+		methodCallCount[0]++;
+	    }
+            
+	};
+	
+	TriggerSerializer<String> triggerSerializer = new TriggerSerializer<String>() {
+
+	    @Override
+	    public String serializeTrigger(ErrorTrigger errorTrigger) {
+                assertFalse("this should not be called in this test case", true);
+                return "";
+	    }
+
+	    @Override
+	    public String serializeTrigger(TimeoutTrigger timeoutTrigger) {
+		methodCallCount[0]++;
+		return SERIALIZED_TIMEOUT;
+	    }
+	    
+	};
+	
+	SnaperrTracer gwSnaperr = new SnaperrTracer(referenceTracker, triggerSerializer, triggerHandler, -1L, -1);
+	gwSnaperr.entering(this, "testTriggerHandlerCalled2");
+	gwSnaperr.onError(this, "testTriggerHandlerCalled2", new NullPointerException());
+	assertTrue("One of TriggerSerializer#serializeTrigger(TimeoutTrigger) or TriggerHandler#onTimeout() was not called", methodCallCount[0] == 2);
     }
 
     private static class ExceptionRethrowSerializer implements TriggerSerializer<String> {
