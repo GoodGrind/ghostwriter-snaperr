@@ -10,7 +10,7 @@ public class DefaultThrottleControlStrategy implements ThrottleControlStrategy {
      * For throttling, amount of time where maximum {@link #maxErrorsInWindow}
      * errors are allowed. < 0 means no throttling
      */
-    private final long errorWindowSize;
+    private final long errorWindowSizeMs;
     /**
      * For throttling, amount of errors allowed in each throttling window. < 0
      * means no throttling
@@ -18,10 +18,14 @@ public class DefaultThrottleControlStrategy implements ThrottleControlStrategy {
     private final int maxErrorsInWindow;
 
     private int errorsInBucket = 0;
-    private long bucketPurgedLastTimeMs = System.currentTimeMillis();
+    private long bucketPurgedLastTimeMs = getCurrentTimeMilis();
 
-    public DefaultThrottleControlStrategy(long errorWindowSize, int maxErrorsInWindow) {
-	this.errorWindowSize = errorWindowSize;
+    /**
+     * @param errorWindowSizeMs Window size in Milisec
+     * @param maxErrorsInWindow maximum number of errors in the window to be handled
+     */
+    public DefaultThrottleControlStrategy(long errorWindowSizeMs, int maxErrorsInWindow) {
+	this.errorWindowSizeMs = errorWindowSizeMs;
 	this.maxErrorsInWindow = maxErrorsInWindow;
     }
 
@@ -55,7 +59,7 @@ public class DefaultThrottleControlStrategy implements ThrottleControlStrategy {
 	final long errorWindowSizeMs = getErrorWindowSizeMs();
 	final int maxErrorCountInWindow = getMaxErrorCountInWindow();
 	
-	final long nowMs = System.currentTimeMillis();
+	final long nowMs = getCurrentTimeMilis();
 	final long elapsedSinceLastPurgeMs = nowMs - bucketPurgedLastTimeMs;
 
 	if (elapsedSinceLastPurgeMs >= errorWindowSizeMs) {
@@ -77,11 +81,18 @@ public class DefaultThrottleControlStrategy implements ThrottleControlStrategy {
     }
 
     private long getErrorWindowSizeMs() {
-	return errorWindowSize;
+	return errorWindowSizeMs;
     }
 
     private int getMaxErrorCountInWindow() {
 	return maxErrorsInWindow;
+    }
+    
+    /**
+     * @return current time in miliseconds
+     */
+    protected long getCurrentTimeMilis() {
+	return System.currentTimeMillis();
     }
 
 }
