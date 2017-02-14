@@ -62,20 +62,24 @@ public class ConfigurationReader {
 
         Properties gwConfigFileProperties = null;
         try {
-            if (gwConfigConfigFilePath.startsWith(CONFIG_FILE_PROTOCOL_FILE)) {
-                gwConfigFileProperties = readFromFile(configFileSysPropName, gwConfigConfigFilePath);
-            } else if (gwConfigConfigFilePath.startsWith(CONFIG_FILE_PROTOCOL_CLASSPATH)) {
-                gwConfigFileProperties = readFromClassPath(configFileSysPropName, gwConfigConfigFilePath);
-            } else if (gwConfigConfigFilePath.startsWith(CONFIG_FILE_PROTOCOL_SYSTEM_PROPERTY)) {
-                gwConfigFileProperties = readFromSystemProperty(configFileSysPropName, gwConfigConfigFilePath);
-            } else {
-                throw new ConfigurationException("Unrecogized value for system property '" + configFileSysPropName
-                        + "', please set either:" + "file:///path/to/file, classpath://META-INF/path, systemProperty");
-            }
-        } catch (IOException e) {
-            throw new ConfigurationException("The " + gwConfigConfigFilePath + " does not exist or is not readable."
-                    + " The file is set in system property '" + configFileSysPropName + "'");
-        }
+	    if (gwConfigConfigFilePath.startsWith(CONFIG_FILE_PROTOCOL_FILE)) {
+		gwConfigFileProperties = readFromFile(configFileSysPropName, gwConfigConfigFilePath);
+	    }
+	    else if (gwConfigConfigFilePath.startsWith(CONFIG_FILE_PROTOCOL_CLASSPATH)) {
+		gwConfigFileProperties = readFromClassPath(configFileSysPropName, gwConfigConfigFilePath);
+	    }
+	    else if (gwConfigConfigFilePath.startsWith(CONFIG_FILE_PROTOCOL_SYSTEM_PROPERTY)) {
+		gwConfigFileProperties = readFromSystemProperty(configFileSysPropName, gwConfigConfigFilePath);
+	    }
+	    else {
+		throw new ConfigurationException("Unrecogized value for system property '" + configFileSysPropName
+			+ "', please set either:" + "file:///path/to/file, classpath://META-INF/path, systemProperty");
+	    }
+	}
+	catch (IOException e) {
+	    throw new ConfigurationException("The " + gwConfigConfigFilePath + " does not exist or is not readable."
+		    + " The file is set in system property '" + configFileSysPropName + "'");
+	}
 
         LOG.debug("Reading configuration file '" + gwConfigConfigFilePath + "'");
         Properties result = filterGwProperties(propertyNamePrefix, gwConfigFileProperties);
@@ -102,6 +106,7 @@ public class ConfigurationReader {
         return "".equals(gwAppName) ? CFG_GW_PROPERTY_NAME_PREFIX
                 : CFG_GW_PROPERTY_NAME_PREFIX + gwAppName + ".";
     }
+
 
     /**
      * @param propertyNamePrefix as returned by {@link #getGwPropertyNamePrefix(String)}
