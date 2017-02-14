@@ -1,11 +1,10 @@
-package io.ghostwriter.rt.snaperr.json;
+package io.ghostwriter.rt.snaperr.json.serializer;
 
 import java.util.Properties;
 
 import io.ghostwriter.rt.snaperr.ConfigurationReader;
 import io.ghostwriter.rt.snaperr.api.SnaperrServiceLoader;
 import io.ghostwriter.rt.snaperr.api.TriggerSerializer;
-import io.ghostwriter.rt.snaperr.json.serializer.JsonSerializer;
 
 /**
  * Default implementation of SnaperrServiceLoader returns:

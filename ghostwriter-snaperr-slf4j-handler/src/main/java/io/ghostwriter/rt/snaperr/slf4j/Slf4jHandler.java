@@ -1,4 +1,4 @@
-package io.ghostwriter.rt.snaperr.slf4j.handler;
+package io.ghostwriter.rt.snaperr.slf4j;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,7 @@ public class Slf4jHandler implements TriggerHandler<String> {
     @Override
     public void onError(String serializedError) {
         StringBuilder sb = new StringBuilder();
-        sb.append(SnaperrTracer.class.getCanonicalName()).append(" state snapshot: \n");
+        sb.append(SnaperrTracer.class.getCanonicalName()).append(" state snapshot on error: \n");
         sb.append(serializedError);
 
         LOG.error(sb.toString());
@@ -21,7 +21,11 @@ public class Slf4jHandler implements TriggerHandler<String> {
 
     @Override
     public void onTimeout(String serializedTimeout) {
-        throw new UnsupportedOperationException();
+        StringBuilder sb = new StringBuilder();
+        sb.append(SnaperrTracer.class.getCanonicalName()).append(" state snapshot on timeout: \n");
+        sb.append(serializedTimeout);
+
+        LOG.error(sb.toString());
     }
 
 }

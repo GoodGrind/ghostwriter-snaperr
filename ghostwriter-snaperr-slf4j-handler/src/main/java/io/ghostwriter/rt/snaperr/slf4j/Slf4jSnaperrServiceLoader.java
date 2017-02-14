@@ -3,7 +3,6 @@ package io.ghostwriter.rt.snaperr.slf4j;
 import io.ghostwriter.rt.snaperr.ConfigurationReader;
 import io.ghostwriter.rt.snaperr.api.SnaperrServiceLoader;
 import io.ghostwriter.rt.snaperr.api.TriggerHandler;
-import io.ghostwriter.rt.snaperr.slf4j.handler.Slf4jHandler;
 
 /**
  * Default implementation of SnaperrServiceLoader returns:
