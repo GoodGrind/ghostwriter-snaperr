@@ -68,7 +68,7 @@ public class DefaultSnaperrServiceLoader implements SnaperrServiceLoader {
      */
     @Override
     public boolean isServiceSupported(Class<?> clazz) {
-	return TriggerSerializer.class.equals(clazz) || TriggerHandler.class.equals(clazz);
+	return TriggerSerializer.class.equals(clazz) || TriggerHandler.class.equals(clazz) || ThrottleControlStrategy.class.equals(clazz);
     }
 
 }

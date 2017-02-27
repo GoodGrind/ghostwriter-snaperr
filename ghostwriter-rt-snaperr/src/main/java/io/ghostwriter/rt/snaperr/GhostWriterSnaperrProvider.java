@@ -78,9 +78,10 @@ public class GhostWriterSnaperrProvider implements TracerProvider<SnaperrTracer>
 
 		if (tmpLoadedService == null) {
 		    throw new IllegalStateException("Service loader " + snaperrServiceLoader.getClass().getName()
-			    + " supports " + clazz.getName() + " but retunred NULL");
+			    + " supports " + clazz.getName() + " but returned NULL");
 		}
 		else {
+		    loadedService = tmpLoadedService;
 		    LOG.info("Loaded service: " + tmpLoadedService.getClass().getName());
 		}
 	    }
