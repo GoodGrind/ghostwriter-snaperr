@@ -1,5 +1,4 @@
 include 'ghostwriter-rt-snaperr'
-include 'ghostwriter-rt-snaperr-slf4j'
 include 'ghostwriter-snaperr-moroi-serializer'
 include 'ghostwriter-snaperr-moroi-handler'
 include 'ghostwriter-snaperr-slf4j-handler'
