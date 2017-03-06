@@ -83,6 +83,7 @@ public class MoroiHandler implements TriggerHandler<String> {
 
                 @Override
                 public boolean verify(String hostname, SSLSession session) {
+                    LOG.warn("SSL Hostname verification is disabled");
                     return true;
                 }
             });

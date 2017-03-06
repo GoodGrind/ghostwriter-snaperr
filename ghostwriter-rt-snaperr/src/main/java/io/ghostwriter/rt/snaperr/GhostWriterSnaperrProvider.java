@@ -66,12 +66,12 @@ public class GhostWriterSnaperrProvider implements TracerProvider<SnaperrTracer>
 	    }
 
 	    if (loadedService != null && isServiceSupported) {
-		LOG.info("An implementation of " + clazz.getName()
+		LOG.debug("An implementation of " + clazz.getName()
 			+ " service has already been loaded. Skipping loading other implementation by Service loader: "
 			+ snaperrServiceLoader.getClass());
 	    }
 	    else if (loadedService == null && isServiceSupported) {
-		LOG.info("Loading implementation of " + clazz.getName() + " by "
+		LOG.debug("Loading implementation of " + clazz.getName() + " by "
 			+ snaperrServiceLoader.getClass().getName() + " service found");
 
 		final T tmpLoadedService = (T) snaperrServiceLoader.load(clazz, configReader);
@@ -82,7 +82,7 @@ public class GhostWriterSnaperrProvider implements TracerProvider<SnaperrTracer>
 		}
 		else {
 		    loadedService = tmpLoadedService;
-		    LOG.info("Loaded service: " + tmpLoadedService.getClass().getName());
+		    LOG.debug("Loaded service: " + tmpLoadedService.getClass().getName());
 		}
 	    }
 	}
