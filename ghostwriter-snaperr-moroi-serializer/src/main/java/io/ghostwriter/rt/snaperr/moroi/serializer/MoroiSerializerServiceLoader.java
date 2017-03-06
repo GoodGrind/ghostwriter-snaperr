@@ -8,6 +8,7 @@ import io.ghostwriter.rt.snaperr.api.TriggerSerializer;
 
 public class MoroiSerializerServiceLoader implements SnaperrServiceLoader {
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T load(Class<T> clazz, ConfigurationReader configReader) {
 	

@@ -22,7 +22,7 @@ public interface ThrottleControlStrategy {
     public boolean isHandleTimeout(TimeoutTrigger timeoutTrigger);
 
     /**
-     * @param timeoutTrigger
+     * @param errorTrigger
      * @return
      * <li> true - SnaperrTracer will handle the error
      * <li> false - SnaperrTracer will NOT handle the error

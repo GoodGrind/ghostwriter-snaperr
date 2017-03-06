@@ -4,8 +4,6 @@ import io.ghostwriter.rt.snaperr.ConfigurationReader;
 
 /**
  * Load a Snaperr service provided service interface name and Configuration reader
- *
- * @param <T>
  */
 public interface SnaperrServiceLoader {
     
