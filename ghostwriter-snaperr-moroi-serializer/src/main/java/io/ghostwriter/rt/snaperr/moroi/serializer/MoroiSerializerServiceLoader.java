@@ -3,10 +3,13 @@ package io.ghostwriter.rt.snaperr.moroi.serializer;
 import java.util.Properties;
 
 import io.ghostwriter.rt.snaperr.ConfigurationReader;
+import io.ghostwriter.rt.snaperr.Logger;
 import io.ghostwriter.rt.snaperr.api.SnaperrServiceLoader;
 import io.ghostwriter.rt.snaperr.api.TriggerSerializer;
 
 public class MoroiSerializerServiceLoader implements SnaperrServiceLoader {
+
+	private final Logger LOG = Logger.getLogger(MoroiSerializerServiceLoader.class.getName());
 
     @SuppressWarnings("unchecked")
     @Override

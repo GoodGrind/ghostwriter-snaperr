@@ -36,6 +36,10 @@ subprojects {
         // show standard out and standard error of the test JVM(s) on the console
         testLogging.showStandardStreams = true
     }
+
+	tasks.withType(Javadoc) {
+		options.addStringOption('Xdoclint:none', '-quiet')
+	}
 }
 
 task identify {
